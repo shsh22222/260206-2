@@ -2,6 +2,27 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { DOORWAYS, WISDOM, TEACHER_COLORS, TEACHER_LABELS, DIAGNOSIS_QUESTIONS, CONSCIOUSNESS_TYPES, GAMES, PENDULUM_WORDS, PRESENT_WORDS, EMOTION_ITEMS } from './data/transurfingData';
 import { load, save, addXP, getTitle } from './store/gameStore';
 
+/* ── Shared Helpers ── */
+const HS_KEY = 'aos_hs_';
+function getHS(gameId) { try { return JSON.parse(localStorage.getItem(HS_KEY + gameId) || '{}'); } catch { return {}; } }
+function setHS(gameId, data) { try { localStorage.setItem(HS_KEY + gameId, JSON.stringify(data)); } catch {} }
+
+function getRank(pct) {
+  if (pct >= 95) return { rank: 'S', label: '覚醒', color: '#fbbf24' };
+  if (pct >= 80) return { rank: 'A', label: '明晰', color: '#4ade80' };
+  if (pct >= 60) return { rank: 'B', label: '集中', color: '#22d3ee' };
+  if (pct >= 40) return { rank: 'C', label: '気づき', color: '#8b5cf6' };
+  return { rank: 'D', label: '萌芽', color: '#94a3b8' };
+}
+
+function calcXP(pct) {
+  if (pct >= 95) return 25;
+  if (pct >= 80) return 20;
+  if (pct >= 60) return 15;
+  if (pct >= 40) return 12;
+  return 10;
+}
+
 /* ── Particles ── */
 function Particles() {
   return (
@@ -50,6 +71,63 @@ const BackBtn = ({ onClick }) => (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
   </button>
 );
+
+/* ── Rank Badge ── */
+function RankBadge({ pct }) {
+  const r = getRank(pct);
+  return (
+    <div className="rank-badge" style={{ '--rank-color': r.color }}>
+      <span className="rank-letter">{r.rank}</span>
+      <span className="rank-label">{r.label}</span>
+    </div>
+  );
+}
+
+/* ── Combo Display ── */
+function ComboDisplay({ combo, multiplier }) {
+  if (combo < 2) return null;
+  return (
+    <div className={`combo-display ${combo >= 10 ? 'combo-fire' : combo >= 5 ? 'combo-hot' : ''}`}>
+      <span className="combo-num">{combo}</span>
+      <span className="combo-text">COMBO</span>
+      {multiplier > 1 && <span className="combo-mult">x{multiplier.toFixed(1)}</span>}
+    </div>
+  );
+}
+
+/* ── Hit Burst Effect ── */
+function HitBurst({ bursts }) {
+  return bursts.map(b => (
+    <div key={b.id} className="hit-burst" style={{ left: b.x, top: b.y, '--burst-color': b.color }}>
+      {[...Array(6)].map((_, i) => <span key={i} className="burst-particle" style={{ '--angle': `${i * 60}deg` }} />)}
+    </div>
+  ));
+}
+
+/* ── Game Result Screen (shared) ── */
+function GameResult({ score, pct, gameId, label, messages, onRetry, onComplete }) {
+  const r = getRank(pct);
+  const xp = calcXP(pct);
+  const hs = getHS(gameId);
+  const isNewBest = !hs.best || score > hs.best;
+  if (isNewBest) setHS(gameId, { ...hs, best: score });
+
+  const msg = messages.find(m => pct >= m.min)?.text || '意識の旅は続く';
+
+  return (
+    <div className="gs-center gs-result-screen">
+      <RankBadge pct={pct} />
+      <span className="gs-result-num">{typeof score === 'number' ? score : score}<small>{label}</small></span>
+      {isNewBest && <span className="gs-new-best">NEW BEST!</span>}
+      {hs.best && !isNewBest && <span className="gs-best-label">ベスト: {hs.best}{label}</span>}
+      <p className="gs-msg gs-msg-wisdom">{msg}</p>
+      <div className="gs-btns">
+        <button className="btn-shuffle" onClick={onRetry}>もう一度</button>
+        <button className="btn-done glow" onClick={() => onComplete(xp)}>完了 +{xp}XP</button>
+      </div>
+    </div>
+  );
+}
 
 /* ── Practice Screen (Timer + Tap to Advance) ── */
 function PracticeScreen({ doorway, onComplete, onBack }) {
@@ -295,41 +373,135 @@ function DiagResultScreen({ type, onPractice, onBack }) {
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-/* ━━ GAME COMPONENTS ━━ */
+/* ━━ GAME COMPONENTS (Pro Level) ━━ */
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
-/* ── Game 1: Thought Stop ── */
+const THOUGHT_MSGS = [
+  { min: 95, text: '思考を超えた存在に触れた。あなたは「空」そのもの。' },
+  { min: 80, text: '長い静寂。観察者としての力が育っている。' },
+  { min: 60, text: '思考の間に、静かな隙間が見え始めた。' },
+  { min: 40, text: '気づきの芽が出てきた。思考に気づくこと自体が成長。' },
+  { min: 0, text: '思考に気づけた——それ自体が意識的な行為。' },
+];
+
+const REFLEX_MSGS = [
+  { min: 95, text: '稲妻のような気づき。意識が純粋な覚醒状態にある。' },
+  { min: 80, text: '研ぎ澄まされた意識。今この瞬間に完全に在る。' },
+  { min: 60, text: '良い反応速度。マインドフルネスが育っている。' },
+  { min: 40, text: '意識は筋肉と同じ。鍛えるほど鋭くなる。' },
+  { min: 0, text: '練習を重ねれば、意識の反応速度は上がっていく。' },
+];
+
+const BREATH_MSGS = [
+  { min: 95, text: '呼吸と意識が完全に一体化した。あなたは呼吸そのもの。' },
+  { min: 80, text: '美しいリズム。呼吸が体と心の架け橋になっている。' },
+  { min: 60, text: '呼吸に意識が乗り始めた。心臓のコヒーレンスが整う。' },
+  { min: 40, text: '呼吸を意識する——それだけで自律神経が変わり始める。' },
+  { min: 0, text: '呼吸に気づくことが、意識的に生きる第一歩。' },
+];
+
+const PENDULUM_MSGS = [
+  { min: 95, text: '振り子の支配から完全に自由だ。思考を選べる存在へ。' },
+  { min: 80, text: 'ネガティブな振り子を素早く見抜く力がある。' },
+  { min: 60, text: '思考の質を見分ける目が育ってきた。' },
+  { min: 40, text: '振り子に気づく力が芽生えている。それだけで半分自由。' },
+  { min: 0, text: '気づきは成長の証。振り子を見る目を養おう。' },
+];
+
+const PRESENT_MSGS = [
+  { min: 95, text: '「今」に完全にアンカーされた意識。時間が消える地点。' },
+  { min: 80, text: '今この瞬間を鋭く認識する力が高い。' },
+  { min: 60, text: '「今」と「非今」を区別する感覚が育っている。' },
+  { min: 40, text: '過去と未来に気づくことが、今に戻る鍵。' },
+  { min: 0, text: '「今」を意識し始めただけで、世界は変わり始める。' },
+];
+
+const FOCUS_MSGS = [
+  { min: 95, text: '驚異的な注意制御力。意識の指揮者になれる。' },
+  { min: 80, text: '高い集中力。衝動を超えて意識的に反応できている。' },
+  { min: 60, text: '良い集中力。Go/No-Goの切り替えが育っている。' },
+  { min: 40, text: '注意のコントロールは鍛錬で磨かれる。' },
+  { min: 0, text: '反応を止める力——それが意識の始まり。' },
+];
+
+const ZEN_MSGS = [
+  { min: 95, text: '完璧な内なる時計。意識が時間を超えて鳴っている。' },
+  { min: 80, text: '深い内的リズム。禅僧のような静かな正確さ。' },
+  { min: 60, text: '呼吸のリズムが安定してきた。内なる時計が動き始める。' },
+  { min: 40, text: 'リズムを感じようとする姿勢が大切。' },
+  { min: 0, text: '正確さより、数えること自体に意識を向けて。' },
+];
+
+const EMOTION_MSGS = [
+  { min: 95, text: '感情の錬金術師。すべての感情を光に変えられる。' },
+  { min: 80, text: '感情の質を瞬時に見極める観察力が高い。' },
+  { min: 60, text: '受容すべき感情と手放す感情の区別が育っている。' },
+  { min: 40, text: '感情に気づくだけで、反応パターンは変わり始める。' },
+  { min: 0, text: '感情は天気のようなもの。あなたは空。' },
+];
+
+/* ── Game 1: Thought Stop (Enhanced) ── */
 function ThoughtStopGame({ onComplete, onBack }) {
   const [phase, setPhase] = useState('ready');
   const [elapsed, setElapsed] = useState(0);
+  const [milestones, setMilestones] = useState([]);
+  const [breathCue, setBreathCue] = useState('');
   const startRef = useRef(null);
   const animRef = useRef(null);
-  const [best, setBest] = useState(() => parseFloat(localStorage.getItem('aos_ts_best') || '0'));
+  const milestoneRef = useRef(new Set());
+  const breathRef = useRef(null);
+
+  const MILESTONES = [
+    { sec: 5, text: '5秒…静寂が広がる' },
+    { sec: 10, text: '10秒…思考が薄れていく' },
+    { sec: 20, text: '20秒…観察者が目覚める' },
+    { sec: 30, text: '30秒…空の意識に触れた' },
+    { sec: 45, text: '45秒…時間が溶けていく' },
+    { sec: 60, text: '60秒…あなたは空そのもの' },
+  ];
 
   const tick = useCallback(() => {
-    setElapsed((Date.now() - startRef.current) / 1000);
+    const t = (Date.now() - startRef.current) / 1000;
+    setElapsed(t);
+    MILESTONES.forEach(m => {
+      if (t >= m.sec && !milestoneRef.current.has(m.sec)) {
+        milestoneRef.current.add(m.sec);
+        setMilestones(prev => [...prev, m]);
+      }
+    });
     animRef.current = requestAnimationFrame(tick);
   }, []);
 
   const start = () => {
     startRef.current = Date.now();
     setElapsed(0);
+    setMilestones([]);
+    milestoneRef.current = new Set();
     setPhase('playing');
     animRef.current = requestAnimationFrame(tick);
+    // Breath cue cycle
+    let i = 0;
+    const cues = ['吸う…', '吐く…'];
+    setBreathCue(cues[0]);
+    breathRef.current = setInterval(() => {
+      i = (i + 1) % 2;
+      setBreathCue(cues[i]);
+    }, 4000);
   };
 
   const stop = () => {
     cancelAnimationFrame(animRef.current);
+    clearInterval(breathRef.current);
     const t = (Date.now() - startRef.current) / 1000;
     setElapsed(t);
-    if (t > best) {
-      setBest(t);
-      localStorage.setItem('aos_ts_best', t.toFixed(1));
-    }
     setPhase('result');
   };
 
-  useEffect(() => () => cancelAnimationFrame(animRef.current), []);
+  useEffect(() => () => { cancelAnimationFrame(animRef.current); clearInterval(breathRef.current); }, []);
+
+  // Score: 0-60+sec mapped to 0-100% for ranking
+  const pct = Math.min(100, (elapsed / 60) * 100);
+  const glowIntensity = Math.min(1, elapsed / 30);
 
   return (
     <div className="game-screen" style={{ '--gc': '#8b5cf6' }}>
@@ -339,48 +511,58 @@ function ThoughtStopGame({ onComplete, onBack }) {
           <div className="gs-center">
             <span className="gs-big-icon">🧠</span>
             <h2 className="gs-title">思考ストップ</h2>
-            <p className="gs-desc">目を閉じて、思考を止めてみよう。<br/>何か考えが浮かんだらタップ。</p>
+            <p className="gs-desc">目を閉じて、思考を止めてみよう。<br/>何か考えが浮かんだらタップ。<br/>深い呼吸が静寂への鍵。</p>
             <button className="gs-start-btn" onClick={start}>スタート</button>
           </div>
         )}
         {phase === 'playing' && (
-          <div className="gs-center gs-play-area" onClick={stop}>
-            <span className="gs-timer-big">{elapsed.toFixed(1)}</span>
+          <div className="gs-center gs-play-area ts-playing" onClick={stop}
+            style={{ '--ts-glow': glowIntensity }}>
+            <div className="ts-mandala" style={{ animationDuration: `${Math.max(8, 30 - elapsed)}s` }} />
+            <span className="gs-timer-big ts-timer">{elapsed.toFixed(1)}</span>
             <span className="gs-timer-unit">秒</span>
+            <span className="ts-breath-cue">{breathCue}</span>
+            {milestones.length > 0 && (
+              <span className="ts-milestone" key={milestones[milestones.length - 1].sec}>
+                {milestones[milestones.length - 1].text}
+              </span>
+            )}
             <p className="gs-hint">思考が浮かんだらタップ</p>
           </div>
         )}
         {phase === 'result' && (
-          <div className="gs-center">
-            <span className="gs-result-num">{elapsed.toFixed(1)}<small>秒</small></span>
-            <span className="gs-best-label">ベスト: {best.toFixed(1)}秒</span>
-            {elapsed >= 10 && <p className="gs-msg">素晴らしい集中力!</p>}
-            {elapsed >= 5 && elapsed < 10 && <p className="gs-msg">良い感じ!</p>}
-            {elapsed < 5 && <p className="gs-msg">練習あるのみ!</p>}
-            <div className="gs-btns">
-              <button className="btn-shuffle" onClick={start}>もう一度</button>
-              <button className="btn-done glow" onClick={() => onComplete(10)}>完了 +10XP</button>
-            </div>
-          </div>
+          <GameResult
+            score={parseFloat(elapsed.toFixed(1))}
+            pct={pct}
+            gameId="thought-stop"
+            label="秒"
+            messages={THOUGHT_MSGS}
+            onRetry={start}
+            onComplete={onComplete}
+          />
         )}
       </div>
     </div>
   );
 }
 
-/* ── Game 2: Reflex ── */
+/* ── Game 2: Reflex (Enhanced) ── */
 function ReflexGame({ onComplete, onBack }) {
-  const [phase, setPhase] = useState('ready'); // ready, waiting, go, result, done
+  const [phase, setPhase] = useState('ready');
   const [round, setRound] = useState(0);
   const [times, setTimes] = useState([]);
   const [reactionTime, setReactionTime] = useState(0);
+  const [combo, setCombo] = useState(0);
+  const [maxCombo, setMaxCombo] = useState(0);
+  const [feedback, setFeedback] = useState(null);
   const startRef = useRef(null);
   const timerRef = useRef(null);
-  const TOTAL_ROUNDS = 5;
+  const TOTAL_ROUNDS = 7;
 
   const startRound = () => {
     setPhase('waiting');
-    const delay = 2000 + Math.random() * 4000;
+    setFeedback(null);
+    const delay = 1500 + Math.random() * 3500;
     timerRef.current = setTimeout(() => {
       startRef.current = Date.now();
       setPhase('go');
@@ -390,12 +572,21 @@ function ReflexGame({ onComplete, onBack }) {
   const handleTap = () => {
     if (phase === 'waiting') {
       clearTimeout(timerRef.current);
+      setReactionTime(-1);
+      setCombo(0);
+      setFeedback('早すぎ!');
       setPhase('result');
-      setReactionTime(-1); // too early
     } else if (phase === 'go') {
       const t = Date.now() - startRef.current;
       setReactionTime(t);
       setTimes(prev => [...prev, t]);
+      const newCombo = combo + 1;
+      setCombo(newCombo);
+      setMaxCombo(prev => Math.max(prev, newCombo));
+      if (t < 200) setFeedback('神速!');
+      else if (t < 300) setFeedback('素早い!');
+      else if (t < 400) setFeedback('Good!');
+      else setFeedback('OK');
       setPhase('result');
     }
   };
@@ -413,6 +604,8 @@ function ReflexGame({ onComplete, onBack }) {
   useEffect(() => () => clearTimeout(timerRef.current), []);
 
   const avg = times.length > 0 ? Math.round(times.reduce((a, b) => a + b, 0) / times.length) : 0;
+  // 150ms=100%, 500ms=0%
+  const pct = times.length > 0 ? Math.max(0, Math.min(100, ((500 - avg) / 350) * 100)) : 0;
 
   return (
     <div className="game-screen" style={{ '--gc': '#f59e0b' }}>
@@ -422,7 +615,7 @@ function ReflexGame({ onComplete, onBack }) {
           <div className="gs-center">
             <span className="gs-big-icon">⚡</span>
             <h2 className="gs-title">意識リフレックス</h2>
-            <p className="gs-desc">画面が光ったら即タップ!<br/>{TOTAL_ROUNDS}ラウンドの平均反応速度を測定。</p>
+            <p className="gs-desc">画面が光ったら即タップ!<br/>{TOTAL_ROUNDS}ラウンドの反応速度を測定。<br/>意識を研ぎ澄ませて。</p>
             <button className="gs-start-btn" onClick={startRound}>スタート</button>
           </div>
         )}
@@ -430,6 +623,7 @@ function ReflexGame({ onComplete, onBack }) {
           <div className="gs-center gs-play-area gs-dark" onClick={handleTap}>
             <p className="gs-wait-text">待って…</p>
             <span className="gs-round-num">{round + 1}/{TOTAL_ROUNDS}</span>
+            <ComboDisplay combo={combo} multiplier={1} />
           </div>
         )}
         {phase === 'go' && (
@@ -440,45 +634,51 @@ function ReflexGame({ onComplete, onBack }) {
         {phase === 'result' && (
           <div className="gs-center">
             {reactionTime === -1 ? (
-              <p className="gs-msg gs-early">早すぎた!</p>
+              <p className="gs-msg gs-early">早すぎた! コンボリセット</p>
             ) : (
-              <span className="gs-result-num">{reactionTime}<small>ms</small></span>
+              <>
+                <span className="gs-result-num">{reactionTime}<small>ms</small></span>
+                <span className={`reflex-feedback ${reactionTime < 250 ? 'fast' : reactionTime < 350 ? 'good' : 'ok'}`}>{feedback}</span>
+              </>
             )}
-            <button className="gs-start-btn" onClick={nextRound}>
+            <ComboDisplay combo={combo} multiplier={1} />
+            <button className="gs-start-btn" onClick={nextRound} style={{ marginTop: 16 }}>
               {round + 1 >= TOTAL_ROUNDS ? '結果を見る' : '次のラウンド'}
             </button>
           </div>
         )}
         {phase === 'done' && (
-          <div className="gs-center">
-            <span className="gs-result-num">{avg}<small>ms</small></span>
-            <span className="gs-best-label">平均反応速度</span>
-            {avg > 0 && avg < 250 && <p className="gs-msg">超高速!</p>}
-            {avg >= 250 && avg < 400 && <p className="gs-msg">良い反射神経!</p>}
-            {avg >= 400 && <p className="gs-msg">もっと研ぎ澄ませよう!</p>}
-            <div className="gs-btns">
-              <button className="btn-shuffle" onClick={() => { setRound(0); setTimes([]); setPhase('ready'); }}>もう一度</button>
-              <button className="btn-done glow" onClick={() => onComplete(10)}>完了 +10XP</button>
-            </div>
-          </div>
+          <GameResult
+            score={avg}
+            pct={pct}
+            gameId="reflex"
+            label="ms"
+            messages={REFLEX_MSGS}
+            onRetry={() => { setRound(0); setTimes([]); setCombo(0); setMaxCombo(0); setPhase('ready'); }}
+            onComplete={onComplete}
+          />
         )}
       </div>
     </div>
   );
 }
 
-/* ── Game 3: Breath Surf ── */
+/* ── Game 3: Breath Surf (Enhanced) ── */
 function BreathSurfGame({ onComplete, onBack }) {
   const [phase, setPhase] = useState('ready');
   const [cycle, setCycle] = useState(0);
-  const [breathPhase, setBreathPhase] = useState('in'); // in, out
+  const [breathPhase, setBreathPhase] = useState('in');
   const [score, setScore] = useState(0);
+  const [combo, setCombo] = useState(0);
+  const [maxCombo, setMaxCombo] = useState(0);
   const [tapFeedback, setTapFeedback] = useState(null);
+  const [perfectCount, setPerfectCount] = useState(0);
+  const [totalTaps, setTotalTaps] = useState(0);
   const progressRef = useRef(0);
   const animRef = useRef(null);
   const [progress, setProgress] = useState(0);
-  const TOTAL_CYCLES = 4;
-  const BREATH_DURATION = 5000; // 5s per phase
+  const TOTAL_CYCLES = 5;
+  const BREATH_DURATION = 5000;
   const startTimeRef = useRef(null);
 
   const startGame = () => {
@@ -486,14 +686,17 @@ function BreathSurfGame({ onComplete, onBack }) {
     setCycle(0);
     setBreathPhase('in');
     setScore(0);
+    setCombo(0);
+    setMaxCombo(0);
+    setPerfectCount(0);
+    setTotalTaps(0);
     startTimeRef.current = Date.now();
     animate();
   };
 
   const animate = () => {
     const elapsed = Date.now() - startTimeRef.current;
-    const totalPhaseTime = BREATH_DURATION;
-    const totalCycleTime = totalPhaseTime * 2;
+    const totalCycleTime = BREATH_DURATION * 2;
     const totalGameTime = totalCycleTime * TOTAL_CYCLES;
 
     if (elapsed >= totalGameTime) {
@@ -503,8 +706,8 @@ function BreathSurfGame({ onComplete, onBack }) {
 
     const currentCycle = Math.floor(elapsed / totalCycleTime);
     const cycleElapsed = elapsed % totalCycleTime;
-    const isInhale = cycleElapsed < totalPhaseTime;
-    const phaseProgress = (cycleElapsed % totalPhaseTime) / totalPhaseTime;
+    const isInhale = cycleElapsed < BREATH_DURATION;
+    const phaseProgress = (cycleElapsed % BREATH_DURATION) / BREATH_DURATION;
 
     setCycle(currentCycle);
     setBreathPhase(isInhale ? 'in' : 'out');
@@ -516,16 +719,27 @@ function BreathSurfGame({ onComplete, onBack }) {
 
   const handleTap = () => {
     if (phase !== 'playing') return;
+    setTotalTaps(t => t + 1);
     const p = progressRef.current;
-    // Good tap: near peak (>0.85) or near trough (<0.15)
-    if (p > 0.85 || p < 0.15) {
-      setScore(s => s + 100);
-      setTapFeedback('perfect');
-    } else if (p > 0.7 || p < 0.3) {
-      setScore(s => s + 50);
-      setTapFeedback('good');
+    const mult = 1 + combo * 0.1;
+    if (p > 0.88 || p < 0.12) {
+      const pts = Math.round(100 * mult);
+      setScore(s => s + pts);
+      const newCombo = combo + 1;
+      setCombo(newCombo);
+      setMaxCombo(prev => Math.max(prev, newCombo));
+      setPerfectCount(c => c + 1);
+      setTapFeedback({ type: 'perfect', pts });
+    } else if (p > 0.72 || p < 0.28) {
+      const pts = Math.round(50 * mult);
+      setScore(s => s + pts);
+      const newCombo = combo + 1;
+      setCombo(newCombo);
+      setMaxCombo(prev => Math.max(prev, newCombo));
+      setTapFeedback({ type: 'good', pts });
     } else {
-      setTapFeedback('miss');
+      setCombo(0);
+      setTapFeedback({ type: 'miss', pts: 0 });
     }
     setTimeout(() => setTapFeedback(null), 400);
   };
@@ -533,6 +747,7 @@ function BreathSurfGame({ onComplete, onBack }) {
   useEffect(() => () => cancelAnimationFrame(animRef.current), []);
 
   const circleScale = 0.4 + progress * 0.6;
+  const pct = TOTAL_CYCLES > 0 ? Math.min(100, (score / (TOTAL_CYCLES * 2 * 100)) * 100) : 0;
 
   return (
     <div className="game-screen" style={{ '--gc': '#06b6d4' }}>
@@ -542,69 +757,81 @@ function BreathSurfGame({ onComplete, onBack }) {
           <div className="gs-center">
             <span className="gs-big-icon">🫁</span>
             <h2 className="gs-title">呼吸サーフ</h2>
-            <p className="gs-desc">円の動きに合わせて呼吸しよう。<br/>ピーク(最大・最小)でタップ!</p>
+            <p className="gs-desc">円の動きに合わせて呼吸しよう。<br/>ピーク(最大・最小)でタップ!<br/>コンボでスコア倍率UP!</p>
             <button className="gs-start-btn" onClick={startGame}>スタート</button>
           </div>
         )}
         {phase === 'playing' && (
-          <div className="gs-center gs-play-area" onClick={handleTap}>
-            <div className="breath-circle" style={{ transform: `scale(${circleScale})` }} />
-            <span className="breath-label">{breathPhase === 'in' ? '吸う' : '吐く'}</span>
+          <div className="gs-center gs-play-area breath-playing" onClick={handleTap}>
+            <ComboDisplay combo={combo} multiplier={1 + combo * 0.1} />
+            <div className="breath-circle" style={{
+              transform: `scale(${circleScale})`,
+              boxShadow: combo >= 5
+                ? `0 0 ${40 + combo * 5}px color-mix(in srgb,var(--gc) ${30 + combo * 3}%,transparent)`
+                : `0 0 30px color-mix(in srgb,var(--gc) 20%,transparent)`,
+            }}>
+              <span className="breath-inner-label">{breathPhase === 'in' ? '吸' : '吐'}</span>
+            </div>
+            <span className="breath-label">{breathPhase === 'in' ? '吸う…' : '吐く…'}</span>
             <span className="breath-score">スコア: {score}</span>
-            {tapFeedback && <span className={`tap-feedback ${tapFeedback}`}>
-              {tapFeedback === 'perfect' ? 'Perfect!' : tapFeedback === 'good' ? 'Good!' : 'Miss'}
-            </span>}
+            {tapFeedback && (
+              <span className={`tap-feedback ${tapFeedback.type}`}>
+                {tapFeedback.type === 'perfect' ? `Perfect! +${tapFeedback.pts}` :
+                 tapFeedback.type === 'good' ? `Good! +${tapFeedback.pts}` : 'Miss'}
+              </span>
+            )}
             <span className="gs-round-num">{cycle + 1}/{TOTAL_CYCLES}</span>
           </div>
         )}
         {phase === 'done' && (
-          <div className="gs-center">
-            <span className="gs-result-num">{score}<small>pt</small></span>
-            <span className="gs-best-label">呼吸スコア</span>
-            <div className="gs-btns">
-              <button className="btn-shuffle" onClick={() => { setPhase('ready'); cancelAnimationFrame(animRef.current); }}>もう一度</button>
-              <button className="btn-done glow" onClick={() => onComplete(10)}>完了 +10XP</button>
-            </div>
-          </div>
+          <GameResult
+            score={score}
+            pct={pct}
+            gameId="breath-surf"
+            label="pt"
+            messages={BREATH_MSGS}
+            onRetry={() => { setPhase('ready'); cancelAnimationFrame(animRef.current); }}
+            onComplete={onComplete}
+          />
         )}
       </div>
     </div>
   );
 }
 
-/* ── Game 4: Pendulum Shooter ── */
+/* ── Game 4: Pendulum Shooter (Enhanced with Waves) ── */
 function PendulumShooterGame({ onComplete, onBack }) {
   const [phase, setPhase] = useState('ready');
   const [bubbles, setBubbles] = useState([]);
   const [score, setScore] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(30);
+  const [timeLeft, setTimeLeft] = useState(35);
   const [hits, setHits] = useState(0);
   const [misses, setMisses] = useState(0);
+  const [combo, setCombo] = useState(0);
+  const [maxCombo, setMaxCombo] = useState(0);
+  const [wave, setWave] = useState(1);
+  const [bursts, setBursts] = useState([]);
+  const [totalNeg, setTotalNeg] = useState(0);
   const idRef = useRef(0);
   const intervalRef = useRef(null);
   const timerRef = useRef(null);
+  const burstIdRef = useRef(0);
 
   const startGame = () => {
     setPhase('playing');
     setScore(0);
-    setTimeLeft(30);
+    setTimeLeft(35);
     setHits(0);
     setMisses(0);
+    setCombo(0);
+    setMaxCombo(0);
+    setWave(1);
+    setTotalNeg(0);
     setBubbles([]);
+    setBursts([]);
     idRef.current = 0;
-
-    intervalRef.current = setInterval(() => {
-      const isNeg = Math.random() > 0.25;
-      const words = isNeg ? PENDULUM_WORDS.negative : PENDULUM_WORDS.positive;
-      const word = words[Math.floor(Math.random() * words.length)];
-      const top = 15 + Math.random() * 65;
-      const fromLeft = Math.random() > 0.5;
-      const id = ++idRef.current;
-      setBubbles(prev => [...prev, { id, word, isNeg, top, fromLeft, hit: false }]);
-      setTimeout(() => {
-        setBubbles(prev => prev.filter(b => b.id !== id));
-      }, 3500);
-    }, 900);
+    burstIdRef.current = 0;
+    startWave(1);
 
     timerRef.current = setInterval(() => {
       setTimeLeft(t => {
@@ -614,20 +841,62 @@ function PendulumShooterGame({ onComplete, onBack }) {
           setPhase('done');
           return 0;
         }
+        // Speed up waves
+        if (t === 24) setWave(2);
+        if (t === 15) setWave(3);
         return t - 1;
       });
     }, 1000);
   };
 
-  const tapBubble = (bubble) => {
+  const startWave = (w) => {
+    clearInterval(intervalRef.current);
+    const spawnRate = w === 1 ? 1000 : w === 2 ? 750 : 550;
+    const speed = w === 1 ? 3500 : w === 2 ? 2800 : 2200;
+
+    intervalRef.current = setInterval(() => {
+      const isNeg = Math.random() > (w === 3 ? 0.35 : 0.25);
+      const words = isNeg ? PENDULUM_WORDS.negative : PENDULUM_WORDS.positive;
+      const word = words[Math.floor(Math.random() * words.length)];
+      const top = 10 + Math.random() * 70;
+      const fromLeft = Math.random() > 0.5;
+      const id = ++idRef.current;
+      if (isNeg) setTotalNeg(n => n + 1);
+      setBubbles(prev => [...prev, { id, word, isNeg, top, fromLeft, hit: false, speed }]);
+      setTimeout(() => {
+        setBubbles(prev => prev.filter(b => b.id !== id));
+      }, speed);
+    }, spawnRate);
+  };
+
+  // Watch wave changes
+  useEffect(() => {
+    if (phase === 'playing' && wave > 1) startWave(wave);
+  }, [wave]);
+
+  const tapBubble = (bubble, e) => {
     if (bubble.hit) return;
     setBubbles(prev => prev.map(b => b.id === bubble.id ? { ...b, hit: true } : b));
+
+    // Burst effect
+    const rect = e.currentTarget.getBoundingClientRect();
+    const bId = ++burstIdRef.current;
+    const burstColor = bubble.isNeg ? '#ef4444' : '#4ade80';
+    setBursts(prev => [...prev, { id: bId, x: rect.left + rect.width / 2, y: rect.top + rect.height / 2, color: burstColor }]);
+    setTimeout(() => setBursts(prev => prev.filter(b => b.id !== bId)), 500);
+
     if (bubble.isNeg) {
-      setScore(s => s + 10);
+      const mult = 1 + combo * 0.15;
+      const pts = Math.round(10 * mult);
+      setScore(s => s + pts);
       setHits(h => h + 1);
+      const newCombo = combo + 1;
+      setCombo(newCombo);
+      setMaxCombo(prev => Math.max(prev, newCombo));
     } else {
-      setScore(s => s - 5);
+      setScore(s => Math.max(0, s - 5));
       setMisses(m => m + 1);
+      setCombo(0);
     }
   };
 
@@ -635,6 +904,8 @@ function PendulumShooterGame({ onComplete, onBack }) {
     clearInterval(intervalRef.current);
     clearInterval(timerRef.current);
   }, []);
+
+  const pct = totalNeg > 0 ? Math.min(100, (hits / Math.max(1, totalNeg)) * 100) : 0;
 
   return (
     <div className="game-screen" style={{ '--gc': '#ef4444' }}>
@@ -644,7 +915,7 @@ function PendulumShooterGame({ onComplete, onBack }) {
           <div className="gs-center">
             <span className="gs-big-icon">🎯</span>
             <h2 className="gs-title">振り子シューター</h2>
-            <p className="gs-desc">ネガティブな思考をタップで撃ち落とせ!<br/>ポジティブな言葉は撃たないで!</p>
+            <p className="gs-desc">ネガティブ思考をタップで撃ち落とせ!<br/>ポジティブは撃たないで!<br/>3ウェーブ制。後半ほど高速に!</p>
             <button className="gs-start-btn" onClick={startGame}>スタート</button>
           </div>
         )}
@@ -652,50 +923,60 @@ function PendulumShooterGame({ onComplete, onBack }) {
           <div className="gs-play-field">
             <div className="pend-hud">
               <span className="pend-score">{score}pt</span>
+              <ComboDisplay combo={combo} multiplier={1 + combo * 0.15} />
+              <span className="pend-wave">W{wave}</span>
               <span className="pend-time">{timeLeft}s</span>
             </div>
             <div className="pend-arena">
               {bubbles.map(b => (
                 <div
                   key={b.id}
-                  className={`pend-bubble ${b.isNeg ? 'neg' : 'pos'} ${b.fromLeft ? 'from-left' : 'from-right'} ${b.hit ? 'hit' : ''}`}
-                  style={{ top: `${b.top}%` }}
-                  onClick={() => tapBubble(b)}
+                  className={`pend-bubble ${b.isNeg ? 'neg' : 'pos'} ${b.fromLeft ? '' : 'from-right'} ${b.hit ? 'hit' : ''}`}
+                  style={{ top: `${b.top}%`, animationDuration: `${b.speed}ms` }}
+                  onClick={(e) => tapBubble(b, e)}
                 >
                   {b.word}
                 </div>
               ))}
             </div>
+            <HitBurst bursts={bursts} />
           </div>
         )}
         {phase === 'done' && (
-          <div className="gs-center">
-            <span className="gs-result-num">{score}<small>pt</small></span>
-            <span className="gs-best-label">撃墜: {hits} / 誤射: {misses}</span>
-            <div className="gs-btns">
-              <button className="btn-shuffle" onClick={startGame}>もう一度</button>
-              <button className="btn-done glow" onClick={() => onComplete(10)}>完了 +10XP</button>
-            </div>
-          </div>
+          <GameResult
+            score={score}
+            pct={pct}
+            gameId="pendulum"
+            label="pt"
+            messages={PENDULUM_MSGS}
+            onRetry={startGame}
+            onComplete={onComplete}
+          />
         )}
       </div>
     </div>
   );
 }
 
-/* ── Game 5: Present Tap ── */
+/* ── Game 5: Present Tap (Enhanced) ── */
 function PresentTapGame({ onComplete, onBack }) {
   const [phase, setPhase] = useState('ready');
   const [currentWord, setCurrentWord] = useState(null);
   const [isPresent, setIsPresent] = useState(false);
   const [score, setScore] = useState(0);
+  const [combo, setCombo] = useState(0);
+  const [maxCombo, setMaxCombo] = useState(0);
+  const [correct, setCorrect] = useState(0);
   const [total, setTotal] = useState(0);
   const [feedback, setFeedback] = useState(null);
   const [timeLeft, setTimeLeft] = useState(30);
+  const [wordSpeed, setWordSpeed] = useState(2000);
   const timerRef = useRef(null);
   const wordTimerRef = useRef(null);
+  const answeredRef = useRef(false);
 
-  const showNextWord = () => {
+  const showNextWord = useCallback((speed) => {
+    answeredRef.current = false;
     const isPresentWord = Math.random() > 0.45;
     const pool = isPresentWord ? PRESENT_WORDS.present : PRESENT_WORDS.notPresent;
     const word = pool[Math.floor(Math.random() * pool.length)];
@@ -704,17 +985,32 @@ function PresentTapGame({ onComplete, onBack }) {
     setTotal(t => t + 1);
 
     wordTimerRef.current = setTimeout(() => {
-      if (!isPresentWord) setScore(s => s + 1); // Correctly ignored
-      showNextWord();
-    }, 2000);
-  };
+      if (!answeredRef.current) {
+        if (!isPresentWord) {
+          // Correctly let pass
+          setCorrect(c => c + 1);
+          const newCombo = combo + 1;
+          setCombo(newCombo);
+          setMaxCombo(prev => Math.max(prev, newCombo));
+        } else {
+          // Missed a present word
+          setCombo(0);
+        }
+      }
+      showNextWord(speed);
+    }, speed);
+  }, [combo]);
 
   const startGame = () => {
     setPhase('playing');
     setScore(0);
+    setCombo(0);
+    setMaxCombo(0);
+    setCorrect(0);
     setTotal(0);
     setTimeLeft(30);
-    showNextWord();
+    setWordSpeed(2000);
+    showNextWord(2000);
 
     timerRef.current = setInterval(() => {
       setTimeLeft(t => {
@@ -724,29 +1020,43 @@ function PresentTapGame({ onComplete, onBack }) {
           setPhase('done');
           return 0;
         }
+        // Speed up over time
+        if (t === 20) setWordSpeed(1600);
+        if (t === 10) setWordSpeed(1200);
         return t - 1;
       });
     }, 1000);
   };
 
   const handleTap = () => {
-    if (phase !== 'playing') return;
+    if (phase !== 'playing' || answeredRef.current) return;
+    answeredRef.current = true;
     clearTimeout(wordTimerRef.current);
+    setTotal(t => t + 1);
     if (isPresent) {
-      setScore(s => s + 2);
-      setFeedback('correct');
+      const mult = 1 + combo * 0.1;
+      const pts = Math.round(10 * mult);
+      setScore(s => s + pts);
+      setCorrect(c => c + 1);
+      const newCombo = combo + 1;
+      setCombo(newCombo);
+      setMaxCombo(prev => Math.max(prev, newCombo));
+      setFeedback({ type: 'correct', pts });
     } else {
-      setScore(s => Math.max(0, s - 1));
-      setFeedback('wrong');
+      setScore(s => Math.max(0, s - 5));
+      setCombo(0);
+      setFeedback({ type: 'wrong', pts: 0 });
     }
     setTimeout(() => setFeedback(null), 300);
-    showNextWord();
+    setTimeout(() => showNextWord(wordSpeed), 200);
   };
 
   useEffect(() => () => {
     clearInterval(timerRef.current);
     clearTimeout(wordTimerRef.current);
   }, []);
+
+  const pct = total > 0 ? Math.min(100, (correct / Math.max(1, total)) * 100) : 0;
 
   return (
     <div className="game-screen" style={{ '--gc': '#ec4899' }}>
@@ -756,47 +1066,53 @@ function PresentTapGame({ onComplete, onBack }) {
           <div className="gs-center">
             <span className="gs-big-icon">✨</span>
             <h2 className="gs-title">今ここタップ</h2>
-            <p className="gs-desc">「今この瞬間」に関する言葉だけタップ!<br/>過去や未来の言葉はスルー!</p>
+            <p className="gs-desc">「今この瞬間」の言葉だけタップ!<br/>過去/未来はスルー!<br/>後半は加速するよ!</p>
             <button className="gs-start-btn" onClick={startGame}>スタート</button>
           </div>
         )}
         {phase === 'playing' && (
           <div className="gs-center gs-play-area" onClick={handleTap}>
             <span className="pend-time" style={{ position: 'absolute', top: 16, right: 16 }}>{timeLeft}s</span>
-            <span className="present-word">{currentWord}</span>
+            <ComboDisplay combo={combo} multiplier={1 + combo * 0.1} />
+            <span className="present-word" key={currentWord}>{currentWord}</span>
             <span className="present-score">スコア: {score}</span>
-            {feedback && <span className={`tap-feedback ${feedback === 'correct' ? 'perfect' : 'miss'}`}>
-              {feedback === 'correct' ? '今ここ!' : '過去/未来!'}
+            {feedback && <span className={`tap-feedback ${feedback.type === 'correct' ? 'perfect' : 'miss'}`}>
+              {feedback.type === 'correct' ? `今ここ! +${feedback.pts}` : '過去/未来!'}
             </span>}
             <p className="gs-hint">「今」の言葉をタップ</p>
           </div>
         )}
         {phase === 'done' && (
-          <div className="gs-center">
-            <span className="gs-result-num">{score}<small>pt</small></span>
-            <span className="gs-best-label">今ここ度</span>
-            <div className="gs-btns">
-              <button className="btn-shuffle" onClick={() => setPhase('ready')}>もう一度</button>
-              <button className="btn-done glow" onClick={() => onComplete(10)}>完了 +10XP</button>
-            </div>
-          </div>
+          <GameResult
+            score={score}
+            pct={pct}
+            gameId="present-tap"
+            label="pt"
+            messages={PRESENT_MSGS}
+            onRetry={() => setPhase('ready')}
+            onComplete={onComplete}
+          />
         )}
       </div>
     </div>
   );
 }
 
-/* ── Game 6: Focus Trainer ── */
+/* ── Game 6: Focus Trainer (Enhanced) ── */
 function FocusGame({ onComplete, onBack }) {
   const [phase, setPhase] = useState('ready');
   const [round, setRound] = useState(0);
   const [isGreen, setIsGreen] = useState(true);
   const [score, setScore] = useState(0);
   const [total, setTotal] = useState(0);
+  const [combo, setCombo] = useState(0);
+  const [maxCombo, setMaxCombo] = useState(0);
   const [feedback, setFeedback] = useState(null);
   const [showDot, setShowDot] = useState(false);
+  const [dotSize, setDotSize] = useState(80);
+  const [streak, setStreak] = useState(0);
   const timerRef = useRef(null);
-  const TOTAL_ROUNDS = 20;
+  const TOTAL_ROUNDS = 25;
 
   const showNextDot = (r) => {
     if (r >= TOTAL_ROUNDS) {
@@ -804,18 +1120,32 @@ function FocusGame({ onComplete, onBack }) {
       return;
     }
     setShowDot(false);
-    const delay = 500 + Math.random() * 1500;
+    setFeedback(null);
+    // Progressive difficulty: faster, smaller dots, more red
+    const speedMult = Math.max(0.4, 1 - r * 0.02);
+    const delay = (400 + Math.random() * 1200) * speedMult;
+    const newSize = Math.max(50, 80 - r * 1.2);
+    setDotSize(newSize);
+
     timerRef.current = setTimeout(() => {
-      const green = Math.random() > 0.35;
+      const greenChance = Math.max(0.35, 0.65 - r * 0.012);
+      const green = Math.random() < greenChance;
       setIsGreen(green);
       setShowDot(true);
       setRound(r);
-      // Auto-advance if not tapped within 1.5s
+      const autoTime = Math.max(800, 1500 - r * 25);
       timerRef.current = setTimeout(() => {
-        if (!green) setScore(s => s + 1); // Correctly ignored red
+        if (!green) {
+          setScore(s => s + 1);
+          const newCombo = combo + 1;
+          setCombo(newCombo);
+          setMaxCombo(prev => Math.max(prev, newCombo));
+        } else {
+          setCombo(0);
+        }
         setTotal(t => t + 1);
         showNextDot(r + 1);
-      }, 1500);
+      }, autoTime);
     }, delay);
   };
 
@@ -824,6 +1154,9 @@ function FocusGame({ onComplete, onBack }) {
     setScore(0);
     setTotal(0);
     setRound(0);
+    setCombo(0);
+    setMaxCombo(0);
+    setStreak(0);
     showNextDot(0);
   };
 
@@ -833,9 +1166,15 @@ function FocusGame({ onComplete, onBack }) {
     setTotal(t => t + 1);
     if (isGreen) {
       setScore(s => s + 1);
+      const newCombo = combo + 1;
+      setCombo(newCombo);
+      setMaxCombo(prev => Math.max(prev, newCombo));
+      setStreak(s => s + 1);
       setFeedback('correct');
     } else {
       setScore(s => Math.max(0, s - 1));
+      setCombo(0);
+      setStreak(0);
       setFeedback('wrong');
     }
     setTimeout(() => setFeedback(null), 300);
@@ -843,6 +1182,8 @@ function FocusGame({ onComplete, onBack }) {
   };
 
   useEffect(() => () => clearTimeout(timerRef.current), []);
+
+  const pct = total > 0 ? Math.min(100, (score / Math.max(1, total)) * 100) : 0;
 
   return (
     <div className="game-screen" style={{ '--gc': '#4ade80' }}>
@@ -852,45 +1193,52 @@ function FocusGame({ onComplete, onBack }) {
           <div className="gs-center">
             <span className="gs-big-icon">🔮</span>
             <h2 className="gs-title">集中トレーナー</h2>
-            <p className="gs-desc">緑の光が出たらタップ!<br/>赤はタップしないで! {TOTAL_ROUNDS}ラウンド。</p>
+            <p className="gs-desc">緑をタップ! 赤はスルー!<br/>{TOTAL_ROUNDS}ラウンド。<br/>後半は小さく・速くなるよ!</p>
             <button className="gs-start-btn" onClick={startGame}>スタート</button>
           </div>
         )}
         {phase === 'playing' && (
           <div className="gs-center gs-play-area" onClick={handleTap}>
             <span className="gs-round-num">{round + 1}/{TOTAL_ROUNDS}</span>
-            {showDot && <div className={`focus-dot ${isGreen ? 'green' : 'red'}`} />}
-            {!showDot && <div className="focus-dot dim" />}
+            <ComboDisplay combo={combo} multiplier={1} />
+            {showDot && <div className={`focus-dot ${isGreen ? 'green' : 'red'}`}
+              style={{ width: dotSize, height: dotSize }} />}
+            {!showDot && <div className="focus-dot dim" style={{ width: dotSize, height: dotSize }} />}
             {feedback && <span className={`tap-feedback ${feedback === 'correct' ? 'perfect' : 'miss'}`}>
-              {feedback === 'correct' ? '正解!' : '違う!'}
+              {feedback === 'correct' ? '正解!' : '我慢!'}
             </span>}
-            <span className="breath-score">スコア: {score}</span>
+            <span className="breath-score">スコア: {score}/{total}</span>
           </div>
         )}
         {phase === 'done' && (
-          <div className="gs-center">
-            <span className="gs-result-num">{Math.round((score / Math.max(1, total)) * 100)}<small>%</small></span>
-            <span className="gs-best-label">集中力スコア ({score}/{total})</span>
-            <div className="gs-btns">
-              <button className="btn-shuffle" onClick={() => setPhase('ready')}>もう一度</button>
-              <button className="btn-done glow" onClick={() => onComplete(10)}>完了 +10XP</button>
-            </div>
-          </div>
+          <GameResult
+            score={Math.round(pct)}
+            pct={pct}
+            gameId="focus"
+            label="%"
+            messages={FOCUS_MSGS}
+            onRetry={() => setPhase('ready')}
+            onComplete={onComplete}
+          />
         )}
       </div>
     </div>
   );
 }
 
-/* ── Game 7: Zen Count ── */
+/* ── Game 7: Zen Count (Enhanced) ── */
 function ZenCountGame({ onComplete, onBack }) {
   const [phase, setPhase] = useState('ready');
   const [count, setCount] = useState(0);
   const [intervals, setIntervals] = useState([]);
   const [feedback, setFeedback] = useState(null);
   const [rounds, setRounds] = useState(0);
+  const [combo, setCombo] = useState(0);
+  const [maxCombo, setMaxCombo] = useState(0);
+  const [score, setScore] = useState(0);
+  const [ringPulse, setRingPulse] = useState(false);
   const lastTapRef = useRef(null);
-  const TARGET_INTERVAL = 5000; // 5 seconds between taps
+  const TARGET_INTERVAL = 5000;
   const TARGET_COUNT = 10;
   const MAX_ROUNDS = 3;
 
@@ -899,6 +1247,9 @@ function ZenCountGame({ onComplete, onBack }) {
     setCount(0);
     setIntervals([]);
     setRounds(0);
+    setCombo(0);
+    setMaxCombo(0);
+    setScore(0);
     lastTapRef.current = null;
   };
 
@@ -907,14 +1258,29 @@ function ZenCountGame({ onComplete, onBack }) {
     const now = Date.now();
     const newCount = count + 1;
     setCount(newCount);
+    setRingPulse(true);
+    setTimeout(() => setRingPulse(false), 300);
 
     if (lastTapRef.current) {
       const interval = now - lastTapRef.current;
       const diff = Math.abs(interval - TARGET_INTERVAL);
       setIntervals(prev => [...prev, diff]);
-      if (diff < 500) setFeedback('perfect');
-      else if (diff < 1200) setFeedback('good');
-      else setFeedback('miss');
+      if (diff < 300) {
+        setFeedback('perfect');
+        setScore(s => s + 30);
+        const newCombo = combo + 1;
+        setCombo(newCombo);
+        setMaxCombo(prev => Math.max(prev, newCombo));
+      } else if (diff < 800) {
+        setFeedback('good');
+        setScore(s => s + 15);
+        const newCombo = combo + 1;
+        setCombo(newCombo);
+        setMaxCombo(prev => Math.max(prev, newCombo));
+      } else {
+        setFeedback('miss');
+        setCombo(0);
+      }
       setTimeout(() => setFeedback(null), 400);
     }
     lastTapRef.current = now;
@@ -945,68 +1311,73 @@ function ZenCountGame({ onComplete, onBack }) {
           <div className="gs-center">
             <span className="gs-big-icon">🔢</span>
             <h2 className="gs-title">禅カウント</h2>
-            <p className="gs-desc">呼吸に合わせて1から10まで数えよう。<br/>5秒間隔でタップ。{MAX_ROUNDS}ラウンド。</p>
+            <p className="gs-desc">5秒間隔で1から10まで数えよう。<br/>{MAX_ROUNDS}ラウンド。<br/>内なるリズムを信じて。</p>
             <button className="gs-start-btn" onClick={startGame}>スタート</button>
           </div>
         )}
         {phase === 'playing' && (
-          <div className="gs-center gs-play-area" onClick={handleTap}>
-            <span className="zen-count-num">{count}</span>
-            <span className="zen-count-label">/ {TARGET_COUNT}</span>
+          <div className="gs-center gs-play-area zen-playing" onClick={handleTap}>
             <span className="gs-round-num">ラウンド {rounds + 1}/{MAX_ROUNDS}</span>
+            <ComboDisplay combo={combo} multiplier={1} />
+            <div className={`zen-ring ${ringPulse ? 'pulse' : ''}`}>
+              <span className="zen-count-num">{count}</span>
+            </div>
+            <span className="zen-count-label">/ {TARGET_COUNT}</span>
             {feedback && <span className={`tap-feedback ${feedback}`}>
-              {feedback === 'perfect' ? 'Perfect!' : feedback === 'good' ? 'Good!' : 'Off Beat'}
+              {feedback === 'perfect' ? 'Perfect! +30' : feedback === 'good' ? 'Good! +15' : 'Off Beat'}
             </span>}
             <p className="gs-hint">5秒ごとにタップ</p>
+            <span className="breath-score">スコア: {score}</span>
           </div>
         )}
         {phase === 'done' && (
-          <div className="gs-center">
-            <span className="gs-result-num">{accuracy}<small>%</small></span>
-            <span className="gs-best-label">リズム精度</span>
-            {accuracy >= 80 && <p className="gs-msg">素晴らしいリズム感!</p>}
-            {accuracy >= 50 && accuracy < 80 && <p className="gs-msg">良いリズム!</p>}
-            {accuracy < 50 && <p className="gs-msg">呼吸を意識して!</p>}
-            <div className="gs-btns">
-              <button className="btn-shuffle" onClick={() => setPhase('ready')}>もう一度</button>
-              <button className="btn-done glow" onClick={() => onComplete(10)}>完了 +10XP</button>
-            </div>
-          </div>
+          <GameResult
+            score={score}
+            pct={accuracy}
+            gameId="zen-count"
+            label="pt"
+            messages={ZEN_MSGS}
+            onRetry={() => setPhase('ready')}
+            onComplete={onComplete}
+          />
         )}
       </div>
     </div>
   );
 }
 
-/* ── Game 8: Emotion Catch ── */
+/* ── Game 8: Emotion Catch (Enhanced with Waves) ── */
 function EmotionCatchGame({ onComplete, onBack }) {
   const [phase, setPhase] = useState('ready');
   const [items, setItems] = useState([]);
   const [score, setScore] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(30);
+  const [timeLeft, setTimeLeft] = useState(35);
+  const [combo, setCombo] = useState(0);
+  const [maxCombo, setMaxCombo] = useState(0);
+  const [catches, setCatches] = useState(0);
+  const [totalAccept, setTotalAccept] = useState(0);
+  const [wave, setWave] = useState(1);
+  const [bursts, setBursts] = useState([]);
   const [feedback, setFeedback] = useState(null);
   const idRef = useRef(0);
   const intervalRef = useRef(null);
   const timerRef = useRef(null);
+  const burstIdRef = useRef(0);
 
   const startGame = () => {
     setPhase('playing');
     setScore(0);
-    setTimeLeft(30);
+    setTimeLeft(35);
+    setCombo(0);
+    setMaxCombo(0);
+    setCatches(0);
+    setTotalAccept(0);
+    setWave(1);
     setItems([]);
+    setBursts([]);
     idRef.current = 0;
-
-    intervalRef.current = setInterval(() => {
-      const isAccept = Math.random() > 0.45;
-      const pool = isAccept ? EMOTION_ITEMS.accept : EMOTION_ITEMS.resist;
-      const word = pool[Math.floor(Math.random() * pool.length)];
-      const left = 10 + Math.random() * 70;
-      const id = ++idRef.current;
-      setItems(prev => [...prev, { id, word, isAccept, left, tapped: false }]);
-      setTimeout(() => {
-        setItems(prev => prev.filter(i => i.id !== id));
-      }, 3000);
-    }, 800);
+    burstIdRef.current = 0;
+    startWave(1);
 
     timerRef.current = setInterval(() => {
       setTimeLeft(t => {
@@ -1016,20 +1387,59 @@ function EmotionCatchGame({ onComplete, onBack }) {
           setPhase('done');
           return 0;
         }
+        if (t === 24) setWave(2);
+        if (t === 13) setWave(3);
         return t - 1;
       });
     }, 1000);
   };
 
-  const tapItem = (item) => {
+  const startWave = (w) => {
+    clearInterval(intervalRef.current);
+    const spawnRate = w === 1 ? 900 : w === 2 ? 700 : 500;
+    const fallSpeed = w === 1 ? 3000 : w === 2 ? 2500 : 2000;
+
+    intervalRef.current = setInterval(() => {
+      const isAccept = Math.random() > (w === 3 ? 0.55 : 0.45);
+      const pool = isAccept ? EMOTION_ITEMS.accept : EMOTION_ITEMS.resist;
+      const word = pool[Math.floor(Math.random() * pool.length)];
+      const left = 5 + Math.random() * 75;
+      const id = ++idRef.current;
+      if (isAccept) setTotalAccept(n => n + 1);
+      setItems(prev => [...prev, { id, word, isAccept, left, tapped: false, speed: fallSpeed }]);
+      setTimeout(() => {
+        setItems(prev => prev.filter(i => i.id !== id));
+      }, fallSpeed);
+    }, spawnRate);
+  };
+
+  useEffect(() => {
+    if (phase === 'playing' && wave > 1) startWave(wave);
+  }, [wave]);
+
+  const tapItem = (item, e) => {
     if (item.tapped) return;
     setItems(prev => prev.map(i => i.id === item.id ? { ...i, tapped: true } : i));
+
+    const rect = e.currentTarget.getBoundingClientRect();
+    const bId = ++burstIdRef.current;
+    const burstColor = item.isAccept ? '#4ade80' : '#ef4444';
+    setBursts(prev => [...prev, { id: bId, x: rect.left + rect.width / 2, y: rect.top + rect.height / 2, color: burstColor }]);
+    setTimeout(() => setBursts(prev => prev.filter(b => b.id !== bId)), 500);
+
     if (item.isAccept) {
-      setScore(s => s + 10);
-      setFeedback('correct');
+      const mult = 1 + combo * 0.12;
+      const pts = Math.round(10 * mult);
+      setScore(s => s + pts);
+      setCatches(c => c + 1);
+      const newCombo = combo + 1;
+      setCombo(newCombo);
+      setMaxCombo(prev => Math.max(prev, newCombo));
+      setFeedback({ type: 'correct', pts });
     } else {
       setScore(s => Math.max(0, s - 5));
-      setFeedback('wrong');
+      setCombo(0);
+      setFeedback({ type: 'wrong', pts: 0 });
     }
     setTimeout(() => setFeedback(null), 300);
   };
@@ -1039,6 +1449,8 @@ function EmotionCatchGame({ onComplete, onBack }) {
     clearInterval(timerRef.current);
   }, []);
 
+  const pct = totalAccept > 0 ? Math.min(100, (catches / Math.max(1, totalAccept)) * 100) : 0;
+
   return (
     <div className="game-screen" style={{ '--gc': '#22d3ee' }}>
       <div className="gs-top"><BackBtn onClick={onBack} /><span className="gs-badge">🎪 感情キャッチ</span></div>
@@ -1047,7 +1459,7 @@ function EmotionCatchGame({ onComplete, onBack }) {
           <div className="gs-center">
             <span className="gs-big-icon">🎪</span>
             <h2 className="gs-title">感情キャッチ</h2>
-            <p className="gs-desc">ポジティブな感情をキャッチ!<br/>ネガティブな感情はスルーして!</p>
+            <p className="gs-desc">ポジティブ感情をキャッチ!<br/>ネガティブはスルー!<br/>3ウェーブ制。コンボで高得点!</p>
             <button className="gs-start-btn" onClick={startGame}>スタート</button>
           </div>
         )}
@@ -1055,6 +1467,8 @@ function EmotionCatchGame({ onComplete, onBack }) {
           <div className="gs-play-field">
             <div className="pend-hud">
               <span className="pend-score">{score}pt</span>
+              <ComboDisplay combo={combo} multiplier={1 + combo * 0.12} />
+              <span className="pend-wave">W{wave}</span>
               <span className="pend-time">{timeLeft}s</span>
             </div>
             <div className="pend-arena emotion-arena">
@@ -1062,27 +1476,29 @@ function EmotionCatchGame({ onComplete, onBack }) {
                 <div
                   key={item.id}
                   className={`emotion-item ${item.isAccept ? 'accept' : 'resist'} ${item.tapped ? 'caught' : ''}`}
-                  style={{ left: `${item.left}%` }}
-                  onClick={() => tapItem(item)}
+                  style={{ left: `${item.left}%`, animationDuration: `${item.speed}ms` }}
+                  onClick={(e) => tapItem(item, e)}
                 >
                   {item.word}
                 </div>
               ))}
             </div>
-            {feedback && <span className={`tap-feedback tap-feedback-fixed ${feedback === 'correct' ? 'perfect' : 'miss'}`}>
-              {feedback === 'correct' ? 'キャッチ!' : '抵抗!'}
+            {feedback && <span className={`tap-feedback tap-feedback-fixed ${feedback.type === 'correct' ? 'perfect' : 'miss'}`}>
+              {feedback.type === 'correct' ? `受容! +${feedback.pts}` : '抵抗!'}
             </span>}
+            <HitBurst bursts={bursts} />
           </div>
         )}
         {phase === 'done' && (
-          <div className="gs-center">
-            <span className="gs-result-num">{score}<small>pt</small></span>
-            <span className="gs-best-label">感情スコア</span>
-            <div className="gs-btns">
-              <button className="btn-shuffle" onClick={() => setPhase('ready')}>もう一度</button>
-              <button className="btn-done glow" onClick={() => onComplete(10)}>完了 +10XP</button>
-            </div>
-          </div>
+          <GameResult
+            score={score}
+            pct={pct}
+            gameId="emotion-catch"
+            label="pt"
+            messages={EMOTION_MSGS}
+            onRetry={startGame}
+            onComplete={onComplete}
+          />
         )}
       </div>
     </div>
@@ -1110,7 +1526,7 @@ export default function App() {
   const [diagResult, setDiagResult] = useState(null);
   const [toast, setToast] = useState(null);
   const [levelUp, setLevelUp] = useState(null);
-  const [homeMode, setHomeMode] = useState('work'); // work | game
+  const [homeMode, setHomeMode] = useState('work');
   const tt = useRef(null);
 
   const showToast = useCallback((amount) => {
@@ -1235,7 +1651,6 @@ export default function App() {
           </div>
 
           <main className="main">
-            {/* Mode Toggle */}
             <div className="mode-toggle">
               <button
                 className={`mode-btn ${homeMode === 'work' ? 'active' : ''}`}
@@ -1278,18 +1693,22 @@ export default function App() {
               <>
                 <p className="prompt">意識で遊ぼう</p>
                 <div className="doorway-grid game-grid">
-                  {GAMES.map(game => (
-                    <button
-                      key={game.id}
-                      className="doorway-card glass game-card"
-                      onClick={() => openGame(game)}
-                      style={{ '--dc': game.color }}
-                    >
-                      <span className="dw-icon">{game.icon}</span>
-                      <span className="dw-name">{game.name}</span>
-                      <span className="dw-desc">{game.desc}</span>
-                    </button>
-                  ))}
+                  {GAMES.map(game => {
+                    const hs = getHS(game.id);
+                    return (
+                      <button
+                        key={game.id}
+                        className="doorway-card glass game-card"
+                        onClick={() => openGame(game)}
+                        style={{ '--dc': game.color }}
+                      >
+                        <span className="dw-icon">{game.icon}</span>
+                        <span className="dw-name">{game.name}</span>
+                        <span className="dw-desc">{game.desc}</span>
+                        {hs.best != null && <span className="game-best">BEST: {hs.best}</span>}
+                      </button>
+                    );
+                  })}
                 </div>
               </>
             )}
