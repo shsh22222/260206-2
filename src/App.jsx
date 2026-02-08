@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { DOORWAYS, WISDOM, TEACHER_COLORS, TEACHER_LABELS, DIAGNOSIS_QUESTIONS, CONSCIOUSNESS_TYPES, GAMES, PENDULUM_WORDS, PRESENT_WORDS, EMOTION_ITEMS } from './data/transurfingData';
+import { DOORWAYS, WISDOM, TEACHER_COLORS, TEACHER_LABELS, DIAGNOSIS_QUESTIONS, CONSCIOUSNESS_TYPES, GAMES } from './data/transurfingData';
 import { load, save, addXP, getTitle } from './store/gameStore';
 
 /* ── Shared Helpers ── */
@@ -392,36 +392,36 @@ const REFLEX_MSGS = [
   { min: 0, text: '練習を重ねれば、意識の反応速度は上がっていく。' },
 ];
 
-const BREATH_MSGS = [
-  { min: 95, text: '呼吸と意識が完全に一体化した。あなたは呼吸そのもの。' },
-  { min: 80, text: '美しいリズム。呼吸が体と心の架け橋になっている。' },
-  { min: 60, text: '呼吸に意識が乗り始めた。心臓のコヒーレンスが整う。' },
-  { min: 40, text: '呼吸を意識する——それだけで自律神経が変わり始める。' },
-  { min: 0, text: '呼吸に気づくことが、意識的に生きる第一歩。' },
+const REFRAME_MSGS = [
+  { min: 95, text: '認知の達人。歪みを瞬時に見抜き、バランスある思考ができる。' },
+  { min: 80, text: '優れた認知柔軟性。思考パターンを書き換える力がある。' },
+  { min: 60, text: '認知の歪みに気づき始めた。それは大きな一歩。' },
+  { min: 40, text: '思考を疑う力が育っている。それ自体が成長。' },
+  { min: 0, text: '思考は事実ではない。気づいたことが始まり。' },
 ];
 
-const PENDULUM_MSGS = [
-  { min: 95, text: '振り子の支配から完全に自由だ。思考を選べる存在へ。' },
-  { min: 80, text: 'ネガティブな振り子を素早く見抜く力がある。' },
-  { min: 60, text: '思考の質を見分ける目が育ってきた。' },
-  { min: 40, text: '振り子に気づく力が芽生えている。それだけで半分自由。' },
-  { min: 0, text: '気づきは成長の証。振り子を見る目を養おう。' },
+const STROOP_MSGS = [
+  { min: 95, text: '驚異的な干渉制御。自動反応を完全に超越した意識。' },
+  { min: 80, text: '高い注意制御力。衝動に打ち勝つ力がある。' },
+  { min: 60, text: '注意の切り替えが上達している。前頭前野が鍛えられている。' },
+  { min: 40, text: '自動反応に気づけるようになってきた。' },
+  { min: 0, text: '気づくことが第一歩。練習で必ず上達する。' },
 ];
 
-const PRESENT_MSGS = [
-  { min: 95, text: '「今」に完全にアンカーされた意識。時間が消える地点。' },
-  { min: 80, text: '今この瞬間を鋭く認識する力が高い。' },
-  { min: 60, text: '「今」と「非今」を区別する感覚が育っている。' },
-  { min: 40, text: '過去と未来に気づくことが、今に戻る鍵。' },
-  { min: 0, text: '「今」を意識し始めただけで、世界は変わり始める。' },
+const EFFICACY_MSGS = [
+  { min: 95, text: '圧倒的な自己効力感。自分の可能性を深く信じている。' },
+  { min: 80, text: '高いエフィカシー。制限的信念を見抜く力がある。' },
+  { min: 60, text: 'セルフイメージが変化し始めている。' },
+  { min: 40, text: '自分の信念パターンに気づき始めた。' },
+  { min: 0, text: '信念は選べる。そう知ったことが変化の始まり。' },
 ];
 
-const FOCUS_MSGS = [
-  { min: 95, text: '驚異的な注意制御力。意識の指揮者になれる。' },
-  { min: 80, text: '高い集中力。衝動を超えて意識的に反応できている。' },
-  { min: 60, text: '良い集中力。Go/No-Goの切り替えが育っている。' },
-  { min: 40, text: '注意のコントロールは鍛錬で磨かれる。' },
-  { min: 0, text: '反応を止める力——それが意識の始まり。' },
+const ELABEL_MSGS = [
+  { min: 95, text: '感情の達人。微細な感情を正確に識別できる。扁桃体が静まる。' },
+  { min: 80, text: '高い感情粒度。ラベリングの力で感情を制御できている。' },
+  { min: 60, text: '感情を言語化する力が育っている。' },
+  { min: 40, text: '感情に名前をつける練習が効いている。' },
+  { min: 0, text: '感情に気づくだけで、その強度は下がる。' },
 ];
 
 const ZEN_MSGS = [
@@ -432,12 +432,12 @@ const ZEN_MSGS = [
   { min: 0, text: '正確さより、数えること自体に意識を向けて。' },
 ];
 
-const EMOTION_MSGS = [
-  { min: 95, text: '感情の錬金術師。すべての感情を光に変えられる。' },
-  { min: 80, text: '感情の質を瞬時に見極める観察力が高い。' },
-  { min: 60, text: '受容すべき感情と手放す感情の区別が育っている。' },
-  { min: 40, text: '感情に気づくだけで、反応パターンは変わり始める。' },
-  { min: 0, text: '感情は天気のようなもの。あなたは空。' },
+const PAIR_MSGS = [
+  { min: 95, text: '驚異的な記憶力と注意力。意識の統合が起きている。' },
+  { min: 80, text: '優れたワーキングメモリ。マインドフルな集中力。' },
+  { min: 60, text: '記憶と集中のバランスが良い。着実に育っている。' },
+  { min: 40, text: '注意を向ける力が育っている。' },
+  { min: 0, text: '繰り返すほど、記憶の回路は強化される。' },
 ];
 
 /* ── Game 1: Thought Stop (Enhanced - 120s S rank) ── */
@@ -721,465 +721,562 @@ function ReflexGame({ onComplete, onBack }) {
   );
 }
 
-/* ── Game 3: Breath Surf (Hard - 8 cycles, shrinking zones, accelerating) ── */
-function BreathSurfGame({ onComplete, onBack }) {
+/* ── Game 3: 認知リフレーミング (CBT Cognitive Reframing) ── */
+const REFRAME_DATA = [
+  { thought: '何をやっても失敗する', correct: '失敗もあるが成功した経験もある', wrong: ['もっと努力すべきだ', '成功は運だ', '自分は無能だ'] },
+  { thought: 'みんなに嫌われている', correct: '全員ではなく好いてくれる人もいる', wrong: ['嫌われて当然だ', '人と関わらない', '自分を変えろ'] },
+  { thought: '絶対にうまくいかない', correct: 'うまくいく可能性もある', wrong: ['やらない方がいい', 'どうせ無駄だ', '諦めろ'] },
+  { thought: '自分は価値がない', correct: '自分にも価値ある面がある', wrong: ['頑張れば価値が出る', '他人より劣る', '考えすぎだ'] },
+  { thought: 'あの時ああすれば…', correct: '過去は変えられないが今から学べる', wrong: ['忘れるべきだ', '自分が全部悪い', '時間を戻したい'] },
+  { thought: '完璧でないと意味がない', correct: '完璧でなくても十分価値がある', wrong: ['完璧を目指すべき', '中途半端はダメ', '妥協は負け'] },
+  { thought: '相手は馬鹿にしている', correct: '相手の意図は確認しないとわからない', wrong: ['やり返すべき', '距離を置こう', '自分が悪い'] },
+  { thought: 'この不安は永遠に続く', correct: '感情は必ず変化する', wrong: ['我慢するしかない', '不安は悪だ', '何かおかしい'] },
+  { thought: '失敗したら終わりだ', correct: '失敗は学びの機会になりうる', wrong: ['失敗は許されない', 'リスクを避けろ', '慎重にすべき'] },
+  { thought: '自分だけがこんなに苦しい', correct: '多くの人が同様の苦しみを経験している', wrong: ['他人は関係ない', '自分が弱い', '誰にもわからない'] },
+  { thought: '感情をコントロールできない', correct: '感情は制御できないが行動は選べる', wrong: ['感情を抑えろ', 'もっと強くなれ', '感情は敵だ'] },
+  { thought: '変われない', correct: '小さな変化は常に可能だ', wrong: ['性格は変わらない', '努力不足だ', '諦めも大事'] },
+  { thought: '助けを求めるのは弱さだ', correct: '助けを求めることは賢明な選択だ', wrong: ['自分で解決すべき', '迷惑をかけるな', '一人で耐えろ'] },
+  { thought: '一度失敗したらもうダメだ', correct: '一度の失敗で全ては決まらない', wrong: ['次は完璧に', '失敗は恥だ', 'やり直せない'] },
+  { thought: '他人は自分を見ている', correct: '多くの人は自分のことで精一杯だ', wrong: ['堂々としろ', '気にするな', '見られて当然'] },
+];
+function ReframeGame({ onComplete, onBack }) {
   const [phase, setPhase] = useState('ready');
-  const [cycle, setCycle] = useState(0);
-  const [breathPhase, setBreathPhase] = useState('in');
+  const [round, setRound] = useState(0);
   const [score, setScore] = useState(0);
   const [combo, setCombo] = useState(0);
-  const [maxCombo, setMaxCombo] = useState(0);
-  const [tapFeedback, setTapFeedback] = useState(null);
-  const [perfectCount, setPerfectCount] = useState(0);
-  const [totalTaps, setTotalTaps] = useState(0);
-  const [lives, setLives] = useState(3);
-  const progressRef = useRef(0);
-  const cycleRef = useRef(0);
-  const animRef = useRef(null);
-  const [progress, setProgress] = useState(0);
-  const TOTAL_CYCLES = 8;
-  const startTimeRef = useRef(null);
-
-  // Breath duration shortens each cycle: 5000→4500→4000→3500→3200→3000→2800→2600
-  const getBreathDuration = (c) => Math.max(2600, 5000 - c * 300);
-
-  const startGame = () => {
-    setPhase('playing');
-    setCycle(0);
-    cycleRef.current = 0;
-    setBreathPhase('in');
-    setScore(0);
-    setCombo(0);
-    setMaxCombo(0);
-    setPerfectCount(0);
-    setTotalTaps(0);
-    setLives(3);
-    startTimeRef.current = Date.now();
-    animate();
-  };
-
-  const animate = () => {
-    const elapsed = Date.now() - startTimeRef.current;
-    // Calculate which cycle we're in based on variable durations
-    let acc = 0;
-    let curCycle = 0;
-    for (let i = 0; i < TOTAL_CYCLES; i++) {
-      const dur = getBreathDuration(i) * 2;
-      if (elapsed < acc + dur) { curCycle = i; break; }
-      acc += dur;
-      if (i === TOTAL_CYCLES - 1) { setPhase('done'); return; }
-    }
-
-    const totalCycleTime = getBreathDuration(curCycle) * 2;
-    const cycleElapsed = elapsed - acc;
-    const bd = getBreathDuration(curCycle);
-    const isInhale = cycleElapsed < bd;
-    const phaseProgress = (cycleElapsed % bd) / bd;
-
-    cycleRef.current = curCycle;
-    setCycle(curCycle);
-    setBreathPhase(isInhale ? 'in' : 'out');
-    progressRef.current = isInhale ? phaseProgress : 1 - phaseProgress;
-    setProgress(progressRef.current);
-
-    animRef.current = requestAnimationFrame(animate);
-  };
-
-  const handleTap = () => {
-    if (phase !== 'playing') return;
-    if (lives <= 0) return;
-    setTotalTaps(t => t + 1);
-    const p = progressRef.current;
-    const c = cycleRef.current;
-    const mult = 1 + combo * 0.12;
-    // Perfect zone shrinks: 0.12→0.10→0.08→0.06...
-    const perfectZone = Math.max(0.05, 0.12 - c * 0.01);
-    const goodZone = Math.max(0.15, 0.28 - c * 0.015);
-
-    if (p > (1 - perfectZone) || p < perfectZone) {
-      const pts = Math.round(120 * mult);
-      setScore(s => s + pts);
-      const newCombo = combo + 1;
-      setCombo(newCombo);
-      setMaxCombo(prev => Math.max(prev, newCombo));
-      setPerfectCount(c2 => c2 + 1);
-      setTapFeedback({ type: 'perfect', pts });
-    } else if (p > (1 - goodZone) || p < goodZone) {
-      const pts = Math.round(50 * mult);
-      setScore(s => s + pts);
-      const newCombo = combo + 1;
-      setCombo(newCombo);
-      setMaxCombo(prev => Math.max(prev, newCombo));
-      setTapFeedback({ type: 'good', pts });
-    } else {
-      setCombo(0);
-      setLives(l => {
-        const next = l - 1;
-        if (next <= 0) {
-          cancelAnimationFrame(animRef.current);
-          setTimeout(() => setPhase('done'), 300);
-        }
-        return next;
-      });
-      setTapFeedback({ type: 'miss', pts: 0 });
-    }
-    setTimeout(() => setTapFeedback(null), 400);
-  };
-
-  useEffect(() => () => cancelAnimationFrame(animRef.current), []);
-
-  const circleScale = 0.4 + progress * 0.6;
-  const pct = TOTAL_CYCLES > 0 ? Math.min(100, (score / (TOTAL_CYCLES * 2 * 120)) * 100) : 0;
-
-  return (
-    <div className="game-screen" style={{ '--gc': '#06b6d4' }}>
-      <div className="gs-top"><BackBtn onClick={onBack} /><span className="gs-badge">🫁 呼吸サーフ</span></div>
-      <div className="gs-body">
-        {phase === 'ready' && (
-          <div className="gs-center">
-            <span className="gs-big-icon">🫁</span>
-            <h2 className="gs-title">呼吸サーフ</h2>
-            <p className="gs-desc">円の動きに合わせてタップ!<br/>ピーク時がPerfect! ミス3回で終了!<br/>後半はゾーンが狭く、速度UP!</p>
-            <button className="gs-start-btn" onClick={startGame}>スタート</button>
-          </div>
-        )}
-        {phase === 'playing' && (
-          <div className="gs-center gs-play-area breath-playing" onClick={handleTap}>
-            <ComboDisplay combo={combo} multiplier={1 + combo * 0.12} />
-            <span className="gs-lives" style={{ position: 'absolute', top: 46, left: 16 }}>{'❤️'.repeat(Math.max(0, lives))}</span>
-            <div className="breath-circle" style={{
-              transform: `scale(${circleScale})`,
-              boxShadow: combo >= 5
-                ? `0 0 ${40 + combo * 5}px color-mix(in srgb,var(--gc) ${30 + combo * 3}%,transparent)`
-                : `0 0 30px color-mix(in srgb,var(--gc) 20%,transparent)`,
-            }}>
-              <span className="breath-inner-label">{breathPhase === 'in' ? '吸' : '吐'}</span>
-            </div>
-            <span className="breath-label">{breathPhase === 'in' ? '吸う…' : '吐く…'}</span>
-            <span className="breath-score">スコア: {score}</span>
-            {tapFeedback && (
-              <span className={`tap-feedback ${tapFeedback.type}`}>
-                {tapFeedback.type === 'perfect' ? `Perfect! +${tapFeedback.pts}` :
-                 tapFeedback.type === 'good' ? `Good! +${tapFeedback.pts}` : 'Miss! -❤️'}
-              </span>
-            )}
-            <span className="gs-round-num">{cycle + 1}/{TOTAL_CYCLES}</span>
-          </div>
-        )}
-        {phase === 'done' && (
-          <GameResult
-            score={score}
-            pct={pct}
-            gameId="breath-surf"
-            label="pt"
-            messages={BREATH_MSGS}
-            onRetry={() => { setPhase('ready'); cancelAnimationFrame(animRef.current); }}
-            onComplete={onComplete}
-          />
-        )}
-      </div>
-    </div>
-  );
-}
-
-/* ── Game 4: Pendulum Shooter (Hard - 5 waves, life system, faster) ── */
-function PendulumShooterGame({ onComplete, onBack }) {
-  const [phase, setPhase] = useState('ready');
-  const [bubbles, setBubbles] = useState([]);
-  const [score, setScore] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(45);
-  const [hits, setHits] = useState(0);
-  const [misses, setMisses] = useState(0);
-  const [combo, setCombo] = useState(0);
-  const [maxCombo, setMaxCombo] = useState(0);
-  const [wave, setWave] = useState(1);
-  const [lives, setLives] = useState(5);
-  const [bursts, setBursts] = useState([]);
-  const [totalNeg, setTotalNeg] = useState(0);
-  const [missedNeg, setMissedNeg] = useState(0);
-  const idRef = useRef(0);
-  const intervalRef = useRef(null);
+  const [correct, setCorrect] = useState(0);
+  const [feedback, setFeedback] = useState(null);
+  const [options, setOptions] = useState([]);
+  const [timeLeft, setTimeLeft] = useState(0);
   const timerRef = useRef(null);
-  const burstIdRef = useRef(0);
-  const livesRef = useRef(5);
+  const questionsRef = useRef([]);
+  const TOTAL = 12;
+  const getTimeLimit = (r) => Math.max(4, 7 - Math.floor(r / 4));
 
   const startGame = () => {
+    const shuffled = [...REFRAME_DATA].sort(() => Math.random() - 0.5).slice(0, TOTAL);
+    questionsRef.current = shuffled;
     setPhase('playing');
+    setRound(0);
     setScore(0);
-    setTimeLeft(45);
-    setHits(0);
-    setMisses(0);
     setCombo(0);
-    setMaxCombo(0);
-    setWave(1);
-    setLives(5);
-    livesRef.current = 5;
-    setTotalNeg(0);
-    setMissedNeg(0);
-    setBubbles([]);
-    setBursts([]);
-    idRef.current = 0;
-    burstIdRef.current = 0;
-    startWave(1);
+    setCorrect(0);
+    setFeedback(null);
+    setupRound(0, shuffled);
+  };
 
+  const setupRound = (r, qs) => {
+    const q = qs[r];
+    const opts = [q.correct, ...q.wrong].sort(() => Math.random() - 0.5);
+    setOptions(opts);
+    const tl = getTimeLimit(r);
+    setTimeLeft(tl);
+    clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
       setTimeLeft(t => {
-        if (t <= 1 || livesRef.current <= 0) {
-          clearInterval(intervalRef.current);
+        if (t <= 1) {
           clearInterval(timerRef.current);
-          setPhase('done');
+          setCombo(0);
+          setFeedback({ type: 'timeout' });
+          setTimeout(() => nextRound(r, qs), 1200);
           return 0;
         }
-        if (t === 37) setWave(2);
-        if (t === 29) setWave(3);
-        if (t === 20) setWave(4);
-        if (t === 11) setWave(5);
         return t - 1;
       });
     }, 1000);
   };
 
-  const startWave = (w) => {
-    clearInterval(intervalRef.current);
-    // 5 waves: progressively faster spawn, faster movement, more negatives
-    const rates = [900, 700, 550, 420, 320];
-    const speeds = [3200, 2800, 2400, 2000, 1600];
-    const negChance = [0.65, 0.60, 0.55, 0.50, 0.50];
-    const spawnRate = rates[Math.min(w - 1, 4)];
-    const speed = speeds[Math.min(w - 1, 4)];
-    const negP = negChance[Math.min(w - 1, 4)];
-
-    intervalRef.current = setInterval(() => {
-      if (livesRef.current <= 0) { clearInterval(intervalRef.current); return; }
-      const isNeg = Math.random() < negP;
-      const words = isNeg ? PENDULUM_WORDS.negative : PENDULUM_WORDS.positive;
-      const word = words[Math.floor(Math.random() * words.length)];
-      const top = 8 + Math.random() * 75;
-      const fromLeft = Math.random() > 0.5;
-      const id = ++idRef.current;
-      if (isNeg) setTotalNeg(n => n + 1);
-      setBubbles(prev => [...prev, { id, word, isNeg, top, fromLeft, hit: false, speed }]);
-      setTimeout(() => {
-        setBubbles(prev => {
-          const b = prev.find(x => x.id === id);
-          if (b && !b.hit && b.isNeg) {
-            // Missed a negative bubble = lose a life
-            setMissedNeg(m => m + 1);
-            livesRef.current -= 1;
-            setLives(livesRef.current);
-            if (livesRef.current <= 0) {
-              clearInterval(intervalRef.current);
-              clearInterval(timerRef.current);
-              setPhase('done');
-            }
-          }
-          return prev.filter(x => x.id !== id);
-        });
-      }, speed);
-    }, spawnRate);
-  };
-
-  useEffect(() => {
-    if (phase === 'playing' && wave > 1) startWave(wave);
-  }, [wave]);
-
-  const tapBubble = (bubble, e) => {
-    if (bubble.hit) return;
-    setBubbles(prev => prev.map(b => b.id === bubble.id ? { ...b, hit: true } : b));
-
-    const rect = e.currentTarget.getBoundingClientRect();
-    const bId = ++burstIdRef.current;
-    const burstColor = bubble.isNeg ? '#ef4444' : '#4ade80';
-    setBursts(prev => [...prev, { id: bId, x: rect.left + rect.width / 2, y: rect.top + rect.height / 2, color: burstColor }]);
-    setTimeout(() => setBursts(prev => prev.filter(b => b.id !== bId)), 500);
-
-    if (bubble.isNeg) {
-      const mult = 1 + combo * 0.15;
-      const pts = Math.round(15 * mult);
-      setScore(s => s + pts);
-      setHits(h => h + 1);
-      const newCombo = combo + 1;
-      setCombo(newCombo);
-      setMaxCombo(prev => Math.max(prev, newCombo));
-    } else {
-      setScore(s => Math.max(0, s - 10));
-      setMisses(m => m + 1);
-      setCombo(0);
-      livesRef.current -= 1;
-      setLives(livesRef.current);
-      if (livesRef.current <= 0) {
-        clearInterval(intervalRef.current);
-        clearInterval(timerRef.current);
-        setTimeout(() => setPhase('done'), 200);
-      }
-    }
-  };
-
-  useEffect(() => () => {
-    clearInterval(intervalRef.current);
+  const handleAnswer = (ans) => {
+    if (feedback) return;
     clearInterval(timerRef.current);
-  }, []);
+    const q = questionsRef.current[round];
+    if (ans === q.correct) {
+      const speedBonus = timeLeft * 5;
+      const comboMult = 1 + combo * 0.15;
+      const pts = Math.round((20 + speedBonus) * comboMult);
+      setScore(s => s + pts);
+      setCorrect(c => c + 1);
+      setCombo(c => c + 1);
+      setFeedback({ type: 'correct', pts, answer: q.correct });
+    } else {
+      setCombo(0);
+      setFeedback({ type: 'wrong', answer: q.correct });
+    }
+    setTimeout(() => nextRound(round, questionsRef.current), 1500);
+  };
 
-  const pct = totalNeg > 0 ? Math.min(100, (hits / Math.max(1, totalNeg)) * 100) : 0;
+  const nextRound = (r, qs) => {
+    const nr = r + 1;
+    setFeedback(null);
+    if (nr >= TOTAL) { setPhase('done'); return; }
+    setRound(nr);
+    setupRound(nr, qs);
+  };
+
+  useEffect(() => () => clearInterval(timerRef.current), []);
+
+  const pct = TOTAL > 0 ? Math.min(100, (correct / TOTAL) * 100) : 0;
+  const q = questionsRef.current[round];
 
   return (
-    <div className="game-screen" style={{ '--gc': '#ef4444' }}>
-      <div className="gs-top"><BackBtn onClick={onBack} /><span className="gs-badge">🎯 振り子シューター</span></div>
+    <div className="game-screen" style={{ '--gc': '#06b6d4' }}>
+      <div className="gs-top"><BackBtn onClick={onBack} /><span className="gs-badge">🔄 認知リフレーミング</span></div>
       <div className="gs-body">
         {phase === 'ready' && (
           <div className="gs-center">
-            <span className="gs-big-icon">🎯</span>
-            <h2 className="gs-title">振り子シューター</h2>
-            <p className="gs-desc">ネガティブ思考を撃ち落とせ!<br/>ポジティブは撃つな! 逃すとライフ減!<br/>5ウェーブ制。どこまで耐えられる?</p>
+            <span className="gs-big-icon">🔄</span>
+            <h2 className="gs-title">認知リフレーミング</h2>
+            <p className="gs-desc">歪んだ自動思考に対して<br/>バランスの取れた考え方を選ぼう。<br/>CBT認知行動療法ベース。{TOTAL}問。</p>
             <button className="gs-start-btn" onClick={startGame}>スタート</button>
           </div>
         )}
-        {phase === 'playing' && (
-          <div className="gs-play-field">
-            <div className="pend-hud">
-              <span className="pend-score">{score}pt</span>
-              <ComboDisplay combo={combo} multiplier={1 + combo * 0.15} />
-              <span className="pend-wave">W{wave}/5</span>
-              <span className="gs-lives">{'❤️'.repeat(Math.max(0, lives))}</span>
-              <span className="pend-time">{timeLeft}s</span>
-            </div>
-            <div className="pend-arena">
-              {bubbles.map(b => (
-                <div
-                  key={b.id}
-                  className={`pend-bubble ${b.isNeg ? 'neg' : 'pos'} ${b.fromLeft ? '' : 'from-right'} ${b.hit ? 'hit' : ''}`}
-                  style={{ top: `${b.top}%`, animationDuration: `${b.speed}ms` }}
-                  onClick={(e) => tapBubble(b, e)}
-                >
-                  {b.word}
-                </div>
+        {phase === 'playing' && q && (
+          <div className="gs-center reframe-area">
+            <span className="gs-round-num">{round + 1}/{TOTAL}</span>
+            <ComboDisplay combo={combo} multiplier={1 + combo * 0.15} />
+            <span className="reframe-timer">{timeLeft}s</span>
+            <div className="reframe-thought">「{q.thought}」</div>
+            <p className="reframe-prompt">バランスの取れた考え方は？</p>
+            <div className="reframe-options">
+              {options.map((opt, i) => (
+                <button key={i}
+                  className={`reframe-opt glass ${feedback ? (opt === q.correct ? 'opt-correct' : feedback.type === 'wrong' ? 'opt-dim' : 'opt-dim') : ''}`}
+                  onClick={() => handleAnswer(opt)}
+                  disabled={!!feedback}
+                >{opt}</button>
               ))}
             </div>
-            <HitBurst bursts={bursts} />
+            {feedback && (
+              <div className={`reframe-feedback ${feedback.type}`}>
+                {feedback.type === 'correct' ? `正解! +${feedback.pts}pt` :
+                 feedback.type === 'wrong' ? `正解: ${feedback.answer}` : 'タイムアウト!'}
+              </div>
+            )}
+            <span className="breath-score">スコア: {score}</span>
           </div>
         )}
         {phase === 'done' && (
-          <GameResult
-            score={score}
-            pct={pct}
-            gameId="pendulum"
-            label="pt"
-            messages={PENDULUM_MSGS}
-            onRetry={startGame}
-            onComplete={onComplete}
-          />
+          <GameResult score={score} pct={pct} gameId="reframe" label="pt"
+            messages={REFRAME_MSGS}
+            onRetry={() => setPhase('ready')} onComplete={onComplete} />
         )}
       </div>
     </div>
   );
 }
 
-/* ── Game 5: Present Tap (Hard - faster, lives, trap words) ── */
-function PresentTapGame({ onComplete, onBack }) {
+/* ── Game 4: ストループ (Stroop Test - Neuroscience) ── */
+const STROOP_COLORS = [
+  { name: '赤', color: '#ef4444' },
+  { name: '青', color: '#3b82f6' },
+  { name: '緑', color: '#22c55e' },
+  { name: '黄', color: '#eab308' },
+];
+function StroopGame({ onComplete, onBack }) {
   const [phase, setPhase] = useState('ready');
-  const [currentWord, setCurrentWord] = useState(null);
-  const [isPresent, setIsPresent] = useState(false);
+  const [round, setRound] = useState(0);
+  const [score, setScore] = useState(0);
+  const [combo, setCombo] = useState(0);
+  const [correct, setCorrect] = useState(0);
+  const [lives, setLives] = useState(3);
+  const [wordText, setWordText] = useState('');
+  const [displayColor, setDisplayColor] = useState('');
+  const [correctColor, setCorrectColor] = useState('');
+  const [feedback, setFeedback] = useState(null);
+  const [answered, setAnswered] = useState(false);
+  const timerRef = useRef(null);
+  const [timeLeft, setTimeLeft] = useState(0);
+  const TOTAL = 25;
+
+  const setupRound = (r) => {
+    setAnswered(false);
+    setFeedback(null);
+    const textIdx = Math.floor(Math.random() * STROOP_COLORS.length);
+    let colorIdx;
+    // 30% congruent (same word & color), 70% incongruent
+    if (Math.random() < 0.30) {
+      colorIdx = textIdx;
+    } else {
+      do { colorIdx = Math.floor(Math.random() * STROOP_COLORS.length); } while (colorIdx === textIdx);
+    }
+    setWordText(STROOP_COLORS[textIdx].name);
+    setDisplayColor(STROOP_COLORS[colorIdx].color);
+    setCorrectColor(STROOP_COLORS[colorIdx].name);
+    const tl = Math.max(2, 4 - Math.floor(r / 8));
+    setTimeLeft(tl);
+    clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setTimeLeft(t => {
+        if (t <= 1) {
+          clearInterval(timerRef.current);
+          setCombo(0);
+          setLives(l => l - 1);
+          setFeedback({ type: 'timeout' });
+          setTimeout(() => advance(r), 1000);
+          return 0;
+        }
+        return t - 1;
+      });
+    }, 1000);
+  };
+
+  const startGame = () => {
+    setPhase('playing');
+    setRound(0);
+    setScore(0);
+    setCombo(0);
+    setCorrect(0);
+    setLives(3);
+    setupRound(0);
+  };
+
+  const handleColor = (colorName) => {
+    if (answered || phase !== 'playing') return;
+    setAnswered(true);
+    clearInterval(timerRef.current);
+    if (colorName === correctColor) {
+      const speedBonus = timeLeft * 8;
+      const pts = Math.round((15 + speedBonus) * (1 + combo * 0.1));
+      setScore(s => s + pts);
+      setCorrect(c => c + 1);
+      setCombo(c => c + 1);
+      setFeedback({ type: 'correct', pts });
+    } else {
+      setCombo(0);
+      setLives(l => l - 1);
+      setFeedback({ type: 'wrong' });
+    }
+    setTimeout(() => advance(round), 800);
+  };
+
+  const advance = (r) => {
+    setFeedback(null);
+    const nr = r + 1;
+    if (nr >= TOTAL || lives <= 0) { setPhase('done'); return; }
+    setRound(nr);
+    setupRound(nr);
+  };
+
+  useEffect(() => () => clearInterval(timerRef.current), []);
+  const pct = TOTAL > 0 ? Math.min(100, (correct / TOTAL) * 100) : 0;
+
+  return (
+    <div className="game-screen" style={{ '--gc': '#ef4444' }}>
+      <div className="gs-top"><BackBtn onClick={onBack} /><span className="gs-badge">🎨 ストループ</span></div>
+      <div className="gs-body">
+        {phase === 'ready' && (
+          <div className="gs-center">
+            <span className="gs-big-icon">🎨</span>
+            <h2 className="gs-title">ストループテスト</h2>
+            <p className="gs-desc">表示された「色」をタップ!<br/>文字の意味ではなく見た目の色!<br/>脳の干渉制御を鍛える{TOTAL}問。</p>
+            <button className="gs-start-btn" onClick={startGame}>スタート</button>
+          </div>
+        )}
+        {phase === 'playing' && (
+          <div className="gs-center stroop-area">
+            <span className="gs-round-num">{round + 1}/{TOTAL}</span>
+            <ComboDisplay combo={combo} multiplier={1 + combo * 0.1} />
+            <span className="gs-lives" style={{ position: 'absolute', top: 46, left: 16 }}>{'❤️'.repeat(Math.max(0, lives))}</span>
+            <span className="stroop-timer">{timeLeft}s</span>
+            <span className="stroop-word" style={{ color: displayColor }}>{wordText}</span>
+            <p className="stroop-hint">この文字の「色」は？</p>
+            <div className="stroop-buttons">
+              {STROOP_COLORS.map(c => (
+                <button key={c.name} className="stroop-btn" style={{ background: c.color }}
+                  onClick={() => handleColor(c.name)} disabled={answered}>
+                  {c.name}
+                </button>
+              ))}
+            </div>
+            {feedback && (
+              <span className={`tap-feedback ${feedback.type === 'correct' ? 'perfect' : 'miss'}`}>
+                {feedback.type === 'correct' ? `正解! +${feedback.pts}` : feedback.type === 'wrong' ? '不正解!' : 'タイムアウト!'}
+              </span>
+            )}
+            <span className="breath-score">スコア: {score}</span>
+          </div>
+        )}
+        {phase === 'done' && (
+          <GameResult score={score} pct={pct} gameId="stroop" label="pt"
+            messages={STROOP_MSGS}
+            onRetry={() => setPhase('ready')} onComplete={onComplete} />
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ── Game 5: Efficacy — Tomabechi belief discrimination (swipe L/R) ── */
+const BELIEFS = [
+  { text: '私には無限の可能性がある', high: true },
+  { text: '失敗は成長の機会だ', high: true },
+  { text: 'どんな目標も達成できる', high: true },
+  { text: '自分の価値は自分で決める', high: true },
+  { text: '困難は乗り越えられる', high: true },
+  { text: '変化を楽しめる', high: true },
+  { text: '他者の評価は参考に過ぎない', high: true },
+  { text: '今の自分を超えられる', high: true },
+  { text: '未知の世界にワクワクする', high: true },
+  { text: 'コンフォートゾーンの外に成長がある', high: true },
+  { text: '私にはどうせ無理だ', high: false },
+  { text: '才能がないとダメだ', high: false },
+  { text: '周りの目が怖い', high: false },
+  { text: '失敗したら終わりだ', high: false },
+  { text: '自分には価値がない', high: false },
+  { text: '過去のせいで変われない', high: false },
+  { text: '完璧でなければ意味がない', high: false },
+  { text: 'どうせ上手くいかない', high: false },
+  { text: '他人と比べて劣っている', high: false },
+  { text: '安定が一番大事だ', high: false },
+];
+
+function EfficacyGame({ onComplete, onBack }) {
+  const [phase, setPhase] = useState('ready');
+  const [beliefs, setBeliefs] = useState([]);
+  const [current, setCurrent] = useState(0);
   const [score, setScore] = useState(0);
   const [combo, setCombo] = useState(0);
   const [maxCombo, setMaxCombo] = useState(0);
   const [correct, setCorrect] = useState(0);
-  const [total, setTotal] = useState(0);
   const [feedback, setFeedback] = useState(null);
-  const [timeLeft, setTimeLeft] = useState(40);
+  const [timeLeft, setTimeLeft] = useState(0);
   const [lives, setLives] = useState(4);
+  const [swipeDir, setSwipeDir] = useState(null);
   const comboRef = useRef(0);
-  const speedRef = useRef(1800);
   const timerRef = useRef(null);
-  const wordTimerRef = useRef(null);
-  const answeredRef = useRef(false);
   const livesRef = useRef(4);
-
-  // Trap words look like "present" but aren't
-  const TRAP_WORDS = ['いつも', '永遠', 'すべて', '全部', '完璧', '絶対'];
-
-  const showNextWord = useCallback((speed) => {
-    answeredRef.current = false;
-    // 40% present, 40% notPresent, 20% trap
-    const r = Math.random();
-    let word, isPresentWord;
-    if (r < 0.40) {
-      const pool = PRESENT_WORDS.present;
-      word = pool[Math.floor(Math.random() * pool.length)];
-      isPresentWord = true;
-    } else if (r < 0.80) {
-      const pool = PRESENT_WORDS.notPresent;
-      word = pool[Math.floor(Math.random() * pool.length)];
-      isPresentWord = false;
-    } else {
-      word = TRAP_WORDS[Math.floor(Math.random() * TRAP_WORDS.length)];
-      isPresentWord = false;
-    }
-    setCurrentWord(word);
-    setIsPresent(isPresentWord);
-    setTotal(t => t + 1);
-
-    wordTimerRef.current = setTimeout(() => {
-      if (!answeredRef.current) {
-        if (isPresentWord) {
-          // Missed a present word = lose life
-          comboRef.current = 0;
-          setCombo(0);
-          livesRef.current -= 1;
-          setLives(livesRef.current);
-          if (livesRef.current <= 0) {
-            clearInterval(timerRef.current);
-            setPhase('done');
-            return;
-          }
-        } else {
-          setCorrect(c => c + 1);
-          comboRef.current += 1;
-          setCombo(comboRef.current);
-          setMaxCombo(prev => Math.max(prev, comboRef.current));
-        }
-      }
-      if (livesRef.current > 0) showNextWord(speed);
-    }, speed);
-  }, []);
+  const TOTAL = 20;
 
   const startGame = () => {
-    setPhase('playing');
+    const shuffled = [...BELIEFS].sort(() => Math.random() - 0.5).slice(0, TOTAL);
+    setBeliefs(shuffled);
+    setCurrent(0);
     setScore(0);
     comboRef.current = 0;
     setCombo(0);
     setMaxCombo(0);
     setCorrect(0);
-    setTotal(0);
-    setTimeLeft(40);
     setLives(4);
     livesRef.current = 4;
-    speedRef.current = 1800;
-    showNextWord(1800);
+    setTimeLeft(4);
+    setPhase('playing');
+  };
 
-    timerRef.current = setInterval(() => {
+  useEffect(() => {
+    if (phase !== 'playing') return;
+    setTimeLeft(4);
+    const id = setInterval(() => {
       setTimeLeft(t => {
-        if (t <= 1 || livesRef.current <= 0) {
-          clearInterval(timerRef.current);
-          clearTimeout(wordTimerRef.current);
-          setPhase('done');
-          return 0;
+        if (t <= 1) {
+          // Time out = wrong
+          comboRef.current = 0;
+          setCombo(0);
+          livesRef.current -= 1;
+          setLives(livesRef.current);
+          setFeedback({ type: 'timeout' });
+          setTimeout(() => setFeedback(null), 400);
+          if (livesRef.current <= 0) {
+            clearInterval(id);
+            setPhase('done');
+            return 0;
+          }
+          setCurrent(c => {
+            if (c + 1 >= beliefs.length) { clearInterval(id); setPhase('done'); }
+            return c + 1;
+          });
+          return 4;
         }
-        // Accelerate: 1800→1400→1000→700
-        if (t === 31) speedRef.current = 1400;
-        if (t === 22) speedRef.current = 1000;
-        if (t === 12) speedRef.current = 700;
         return t - 1;
       });
     }, 1000);
+    timerRef.current = id;
+    return () => clearInterval(id);
+  }, [phase, current, beliefs.length]);
+
+  const answer = (isHigh) => {
+    if (phase !== 'playing' || !beliefs[current]) return;
+    const belief = beliefs[current];
+    const isCorrect = belief.high === isHigh;
+    setSwipeDir(isHigh ? 'right' : 'left');
+    setTimeout(() => setSwipeDir(null), 350);
+
+    if (isCorrect) {
+      const timeBonus = timeLeft * 5;
+      const mult = 1 + comboRef.current * 0.15;
+      const pts = Math.round((20 + timeBonus) * mult);
+      setScore(s => s + pts);
+      setCorrect(c => c + 1);
+      comboRef.current += 1;
+      setCombo(comboRef.current);
+      setMaxCombo(prev => Math.max(prev, comboRef.current));
+      setFeedback({ type: 'correct', pts, msg: isHigh ? '高エフィカシー!' : '見抜いた!' });
+    } else {
+      comboRef.current = 0;
+      setCombo(0);
+      livesRef.current -= 1;
+      setLives(livesRef.current);
+      setFeedback({ type: 'wrong', msg: belief.high ? 'これは高エフィカシー!' : 'これは低エフィカシー!' });
+      if (livesRef.current <= 0) {
+        setTimeout(() => setPhase('done'), 400);
+        return;
+      }
+    }
+    setTimeout(() => setFeedback(null), 500);
+    setCurrent(c => {
+      if (c + 1 >= beliefs.length) setTimeout(() => setPhase('done'), 500);
+      return c + 1;
+    });
   };
 
-  const handleTap = () => {
-    if (phase !== 'playing' || answeredRef.current) return;
-    answeredRef.current = true;
-    clearTimeout(wordTimerRef.current);
-    if (isPresent) {
-      const mult = 1 + comboRef.current * 0.12;
-      const pts = Math.round(15 * mult);
+  useEffect(() => () => clearInterval(timerRef.current), []);
+
+  const pct = current > 0 ? Math.min(100, (correct / current) * 100) : 0;
+
+  return (
+    <div className="game-screen" style={{ '--gc': '#ec4899' }}>
+      <div className="gs-top"><BackBtn onClick={onBack} /><span className="gs-badge">💎 エフィカシー</span></div>
+      <div className="gs-body">
+        {phase === 'ready' && (
+          <div className="gs-center">
+            <span className="gs-big-icon">💎</span>
+            <h2 className="gs-title">エフィカシー判別</h2>
+            <p className="gs-desc">信念を瞬時に見抜け!<br/>高エフィカシー → 右ボタン<br/>低エフィカシー → 左ボタン<br/>4秒以内! ライフ4。{TOTAL}問!</p>
+            <button className="gs-start-btn" onClick={startGame}>スタート</button>
+          </div>
+        )}
+        {phase === 'playing' && beliefs[current] && (
+          <div className="gs-center efficacy-area">
+            <span className="gs-round-num">{current + 1}/{TOTAL}</span>
+            <span className="gs-lives" style={{ position: 'absolute', top: 46, left: 16 }}>{'❤️'.repeat(Math.max(0, lives))}</span>
+            <div className="efficacy-timer-bar">
+              <div className="efficacy-timer-fill" style={{ width: `${(timeLeft / 4) * 100}%` }} />
+            </div>
+            <ComboDisplay combo={combo} multiplier={1 + combo * 0.15} />
+            <div className={`efficacy-card ${swipeDir || ''}`}>
+              <p className="efficacy-text">{beliefs[current].text}</p>
+            </div>
+            <div className="efficacy-buttons">
+              <button className="efficacy-btn low" onClick={() => answer(false)}>
+                <span className="efficacy-btn-icon">👎</span>
+                <span>低エフィカシー</span>
+              </button>
+              <button className="efficacy-btn high" onClick={() => answer(true)}>
+                <span className="efficacy-btn-icon">👍</span>
+                <span>高エフィカシー</span>
+              </button>
+            </div>
+            {feedback && <span className={`tap-feedback ${feedback.type === 'correct' ? 'perfect' : 'miss'}`}>
+              {feedback.type === 'correct' ? `${feedback.msg} +${feedback.pts}` : feedback.type === 'timeout' ? 'タイムアウト! -❤️' : `${feedback.msg} -❤️`}
+            </span>}
+            <span className="breath-score">スコア: {score}</span>
+          </div>
+        )}
+        {phase === 'done' && (
+          <GameResult score={score} pct={pct} gameId="efficacy" label="pt"
+            messages={EFFICACY_MSGS}
+            onRetry={() => setPhase('ready')} onComplete={onComplete} />
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ── Game 6: Emotion Labeling — UCLA affect labeling (scenario→emotion quiz) ── */
+const EMOTION_SCENARIOS = [
+  { scenario: '大切なプレゼンの直前、手が震えている', answer: '不安', options: ['怒り', '不安', '興奮', '悲しみ'] },
+  { scenario: '友人が約束を3回連続で破った', answer: '失望', options: ['失望', '恐怖', '嫉妬', '退屈'] },
+  { scenario: '努力が認められず、後輩が昇進した', answer: '悔しさ', options: ['悲しみ', '悔しさ', '恐怖', '驚き'] },
+  { scenario: '久しぶりに実家に帰り、懐かしい匂いがした', answer: '郷愁', options: ['安心', '郷愁', '喜び', '寂しさ'] },
+  { scenario: '渋滞で大事な面接に遅刻しそうだ', answer: '焦り', options: ['怒り', '焦り', '悲しみ', '諦め'] },
+  { scenario: 'SNSで友人の華やかな生活を見た', answer: '嫉妬', options: ['嫉妬', '怒り', '悲しみ', '無関心'] },
+  { scenario: '暗い夜道で後ろから足音が聞こえる', answer: '恐怖', options: ['不安', '恐怖', '怒り', '驚き'] },
+  { scenario: '大好きなペットとの別れ', answer: '悲嘆', options: ['悲嘆', '後悔', '怒り', '恐怖'] },
+  { scenario: '自分の失言で相手を傷つけてしまった', answer: '罪悪感', options: ['恥', '罪悪感', '怒り', '悲しみ'] },
+  { scenario: '長年の夢だった目標を達成した瞬間', answer: '達成感', options: ['安堵', '達成感', '興奮', '驚き'] },
+  { scenario: '誰にも理解されていないと感じる', answer: '孤独', options: ['悲しみ', '怒り', '孤独', '不安'] },
+  { scenario: '人前でスピーチ中に頭が真っ白になった', answer: '恥', options: ['恥', '恐怖', '怒り', '悲しみ'] },
+  { scenario: '信頼していた人に裏切られた', answer: '裏切り感', options: ['怒り', '裏切り感', '悲しみ', '恐怖'] },
+  { scenario: '子供の成長を見て目頭が熱くなった', answer: '感動', options: ['感動', '悲しみ', '郷愁', '安心'] },
+  { scenario: '何もかもうまくいかず、布団から出たくない', answer: '無力感', options: ['退屈', '悲しみ', '無力感', '怒り'] },
+  { scenario: '待ちに待った旅行の前夜', answer: '期待', options: ['期待', '興奮', '不安', '喜び'] },
+  { scenario: '理不尽な命令を上司から受けた', answer: '憤り', options: ['悲しみ', '憤り', '恐怖', '諦め'] },
+  { scenario: '好きな人からメッセージが来た', answer: 'ときめき', options: ['喜び', '不安', 'ときめき', '驚き'] },
+];
+
+function EmotionLabelGame({ onComplete, onBack }) {
+  const [phase, setPhase] = useState('ready');
+  const [scenarios, setScenarios] = useState([]);
+  const [current, setCurrent] = useState(0);
+  const [score, setScore] = useState(0);
+  const [combo, setCombo] = useState(0);
+  const [maxCombo, setMaxCombo] = useState(0);
+  const [correct, setCorrect] = useState(0);
+  const [feedback, setFeedback] = useState(null);
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [lives, setLives] = useState(3);
+  const [selected, setSelected] = useState(null);
+  const comboRef = useRef(0);
+  const timerRef = useRef(null);
+  const livesRef = useRef(3);
+  const TOTAL = 15;
+
+  const startGame = () => {
+    const shuffled = [...EMOTION_SCENARIOS].sort(() => Math.random() - 0.5).slice(0, TOTAL);
+    shuffled.forEach(s => { s.options = [...s.options].sort(() => Math.random() - 0.5); });
+    setScenarios(shuffled);
+    setCurrent(0);
+    setScore(0);
+    comboRef.current = 0;
+    setCombo(0);
+    setMaxCombo(0);
+    setCorrect(0);
+    setLives(3);
+    livesRef.current = 3;
+    setTimeLeft(6);
+    setPhase('playing');
+  };
+
+  useEffect(() => {
+    if (phase !== 'playing') return;
+    setTimeLeft(6);
+    setSelected(null);
+    const id = setInterval(() => {
+      setTimeLeft(t => {
+        if (t <= 1) {
+          comboRef.current = 0;
+          setCombo(0);
+          livesRef.current -= 1;
+          setLives(livesRef.current);
+          setFeedback({ type: 'timeout', answer: scenarios[current]?.answer });
+          setTimeout(() => setFeedback(null), 600);
+          if (livesRef.current <= 0) {
+            clearInterval(id);
+            setPhase('done');
+            return 0;
+          }
+          setCurrent(c => {
+            if (c + 1 >= scenarios.length) { clearInterval(id); setPhase('done'); }
+            return c + 1;
+          });
+          return 6;
+        }
+        return t - 1;
+      });
+    }, 1000);
+    timerRef.current = id;
+    return () => clearInterval(id);
+  }, [phase, current, scenarios]);
+
+  const answer = (opt) => {
+    if (phase !== 'playing' || !scenarios[current] || selected) return;
+    const sc = scenarios[current];
+    const isCorrect = opt === sc.answer;
+    setSelected(opt);
+
+    if (isCorrect) {
+      const timeBonus = timeLeft * 4;
+      const mult = 1 + comboRef.current * 0.15;
+      const pts = Math.round((25 + timeBonus) * mult);
       setScore(s => s + pts);
       setCorrect(c => c + 1);
       comboRef.current += 1;
@@ -1187,236 +1284,72 @@ function PresentTapGame({ onComplete, onBack }) {
       setMaxCombo(prev => Math.max(prev, comboRef.current));
       setFeedback({ type: 'correct', pts });
     } else {
-      setScore(s => Math.max(0, s - 8));
       comboRef.current = 0;
       setCombo(0);
       livesRef.current -= 1;
       setLives(livesRef.current);
-      setFeedback({ type: 'wrong', pts: 0 });
+      setFeedback({ type: 'wrong', answer: sc.answer });
       if (livesRef.current <= 0) {
-        clearInterval(timerRef.current);
-        setTimeout(() => setPhase('done'), 300);
+        setTimeout(() => setPhase('done'), 600);
         return;
       }
     }
-    setTimeout(() => setFeedback(null), 300);
-    setTimeout(() => showNextWord(speedRef.current), 200);
+    setTimeout(() => {
+      setFeedback(null);
+      setSelected(null);
+      setCurrent(c => {
+        if (c + 1 >= scenarios.length) setTimeout(() => setPhase('done'), 300);
+        return c + 1;
+      });
+    }, 600);
   };
 
-  useEffect(() => () => {
-    clearInterval(timerRef.current);
-    clearTimeout(wordTimerRef.current);
-  }, []);
+  useEffect(() => () => clearInterval(timerRef.current), []);
 
-  const pct = total > 0 ? Math.min(100, (correct / Math.max(1, total)) * 100) : 0;
-
-  return (
-    <div className="game-screen" style={{ '--gc': '#ec4899' }}>
-      <div className="gs-top"><BackBtn onClick={onBack} /><span className="gs-badge">✨ 今ここタップ</span></div>
-      <div className="gs-body">
-        {phase === 'ready' && (
-          <div className="gs-center">
-            <span className="gs-big-icon">✨</span>
-            <h2 className="gs-title">今ここタップ</h2>
-            <p className="gs-desc">「今この瞬間」の言葉だけタップ!<br/>過去/未来/トラップはスルー!<br/>ミスorスルーで❤️減。加速注意!</p>
-            <button className="gs-start-btn" onClick={startGame}>スタート</button>
-          </div>
-        )}
-        {phase === 'playing' && (
-          <div className="gs-center gs-play-area" onClick={handleTap}>
-            <span className="pend-time" style={{ position: 'absolute', top: 16, right: 16 }}>{timeLeft}s</span>
-            <span className="gs-lives" style={{ position: 'absolute', top: 46, left: 16 }}>{'❤️'.repeat(Math.max(0, lives))}</span>
-            <ComboDisplay combo={combo} multiplier={1 + combo * 0.12} />
-            <span className="present-word" key={currentWord}>{currentWord}</span>
-            <span className="present-score">スコア: {score}</span>
-            {feedback && <span className={`tap-feedback ${feedback.type === 'correct' ? 'perfect' : 'miss'}`}>
-              {feedback.type === 'correct' ? `今ここ! +${feedback.pts}` : 'トラップ! -❤️'}
-            </span>}
-            <p className="gs-hint">「今」の言葉だけをタップ</p>
-          </div>
-        )}
-        {phase === 'done' && (
-          <GameResult
-            score={score}
-            pct={pct}
-            gameId="present-tap"
-            label="pt"
-            messages={PRESENT_MSGS}
-            onRetry={() => setPhase('ready')}
-            onComplete={onComplete}
-          />
-        )}
-      </div>
-    </div>
-  );
-}
-
-/* ── Game 6: Focus Trainer (Hard - random pos, yellow traps, 30 rounds, lives) ── */
-function FocusGame({ onComplete, onBack }) {
-  const [phase, setPhase] = useState('ready');
-  const [round, setRound] = useState(0);
-  const [dotType, setDotType] = useState('green'); // green|red|yellow
-  const [score, setScore] = useState(0);
-  const [total, setTotal] = useState(0);
-  const [combo, setCombo] = useState(0);
-  const [maxCombo, setMaxCombo] = useState(0);
-  const [feedback, setFeedback] = useState(null);
-  const [showDot, setShowDot] = useState(false);
-  const [dotSize, setDotSize] = useState(70);
-  const [dotPos, setDotPos] = useState({ x: 50, y: 50 });
-  const [lives, setLives] = useState(3);
-  const timerRef = useRef(null);
-  const comboRef = useRef(0);
-  const livesRef = useRef(3);
-  const TOTAL_ROUNDS = 30;
-
-  const showNextDot = (r) => {
-    if (r >= TOTAL_ROUNDS || livesRef.current <= 0) {
-      setPhase('done');
-      return;
-    }
-    setShowDot(false);
-    setFeedback(null);
-
-    const speedMult = Math.max(0.3, 1 - r * 0.022);
-    const delay = (300 + Math.random() * 1000) * speedMult;
-    const newSize = Math.max(36, 70 - r * 1.3);
-    setDotSize(newSize);
-
-    timerRef.current = setTimeout(() => {
-      // Random position on screen
-      const x = 15 + Math.random() * 70;
-      const y = 20 + Math.random() * 55;
-      setDotPos({ x, y });
-
-      // Determine dot type: green(tap), red(don't tap), yellow(trap - don't tap, looks tempting)
-      const rnd = Math.random();
-      const greenChance = Math.max(0.30, 0.55 - r * 0.008);
-      const yellowChance = r >= 8 ? Math.min(0.20, (r - 8) * 0.01) : 0;
-      let type;
-      if (rnd < greenChance) type = 'green';
-      else if (rnd < greenChance + yellowChance) type = 'yellow';
-      else type = 'red';
-
-      setDotType(type);
-      setShowDot(true);
-      setRound(r);
-
-      const autoTime = Math.max(500, 1200 - r * 22);
-      timerRef.current = setTimeout(() => {
-        // Time expired without tap
-        setTotal(t => t + 1);
-        if (type !== 'green') {
-          // Correctly avoided
-          setScore(s => s + 1);
-          comboRef.current += 1;
-          setCombo(comboRef.current);
-          setMaxCombo(prev => Math.max(prev, comboRef.current));
-        } else {
-          // Missed green = lose life
-          comboRef.current = 0;
-          setCombo(0);
-          livesRef.current -= 1;
-          setLives(livesRef.current);
-        }
-        showNextDot(r + 1);
-      }, autoTime);
-    }, delay);
-  };
-
-  const startGame = () => {
-    setPhase('playing');
-    setScore(0);
-    setTotal(0);
-    setRound(0);
-    comboRef.current = 0;
-    setCombo(0);
-    setMaxCombo(0);
-    setLives(3);
-    livesRef.current = 3;
-    showNextDot(0);
-  };
-
-  const handleTap = () => {
-    if (phase !== 'playing' || !showDot) return;
-    clearTimeout(timerRef.current);
-    setTotal(t => t + 1);
-    if (dotType === 'green') {
-      setScore(s => s + 1);
-      comboRef.current += 1;
-      setCombo(comboRef.current);
-      setMaxCombo(prev => Math.max(prev, comboRef.current));
-      setFeedback('correct');
-    } else if (dotType === 'yellow') {
-      // Yellow trap - looks green-ish but shouldn't tap
-      comboRef.current = 0;
-      setCombo(0);
-      livesRef.current -= 1;
-      setLives(livesRef.current);
-      setFeedback('trap');
-      if (livesRef.current <= 0) {
-        setTimeout(() => setPhase('done'), 300);
-        return;
-      }
-    } else {
-      // Red - shouldn't tap
-      setScore(s => Math.max(0, s - 1));
-      comboRef.current = 0;
-      setCombo(0);
-      livesRef.current -= 1;
-      setLives(livesRef.current);
-      setFeedback('wrong');
-      if (livesRef.current <= 0) {
-        setTimeout(() => setPhase('done'), 300);
-        return;
-      }
-    }
-    setTimeout(() => setFeedback(null), 300);
-    showNextDot(round + 1);
-  };
-
-  useEffect(() => () => clearTimeout(timerRef.current), []);
-
-  const pct = total > 0 ? Math.min(100, (score / Math.max(1, total)) * 100) : 0;
+  const pct = current > 0 ? Math.min(100, (correct / current) * 100) : 0;
 
   return (
     <div className="game-screen" style={{ '--gc': '#4ade80' }}>
-      <div className="gs-top"><BackBtn onClick={onBack} /><span className="gs-badge">🔮 集中トレーナー</span></div>
+      <div className="gs-top"><BackBtn onClick={onBack} /><span className="gs-badge">🏷️ 感情ラベリング</span></div>
       <div className="gs-body">
         {phase === 'ready' && (
           <div className="gs-center">
-            <span className="gs-big-icon">🔮</span>
-            <h2 className="gs-title">集中トレーナー</h2>
-            <p className="gs-desc">緑をタップ! 赤はスルー!<br/>黄色はトラップ——タップ厳禁!<br/>{TOTAL_ROUNDS}ラウンド。ライフ3。<br/>ドットは移動し縮小する!</p>
+            <span className="gs-big-icon">🏷️</span>
+            <h2 className="gs-title">感情ラベリング</h2>
+            <p className="gs-desc">場面から正確な感情を選べ!<br/>UCLA研究: 感情に名前をつけると扁桃体が鎮まる<br/>6秒以内! ライフ3。{TOTAL}問!</p>
             <button className="gs-start-btn" onClick={startGame}>スタート</button>
           </div>
         )}
-        {phase === 'playing' && (
-          <div className="gs-center gs-play-area focus-arena" onClick={handleTap}>
-            <span className="gs-round-num">{round + 1}/{TOTAL_ROUNDS}</span>
-            <ComboDisplay combo={combo} multiplier={1} />
+        {phase === 'playing' && scenarios[current] && (
+          <div className="gs-center elabel-area">
+            <span className="gs-round-num">{current + 1}/{TOTAL}</span>
             <span className="gs-lives" style={{ position: 'absolute', top: 46, left: 16 }}>{'❤️'.repeat(Math.max(0, lives))}</span>
-            {showDot && (
-              <div className={`focus-dot focus-dot-abs ${dotType}`}
-                style={{ width: dotSize, height: dotSize, left: `${dotPos.x}%`, top: `${dotPos.y}%` }} />
-            )}
-            {!showDot && <div className="focus-dot dim" style={{ width: dotSize, height: dotSize }} />}
-            {feedback && <span className={`tap-feedback ${feedback === 'correct' ? 'perfect' : feedback === 'trap' ? 'miss' : 'miss'}`}>
-              {feedback === 'correct' ? '正解!' : feedback === 'trap' ? 'トラップ! -❤️' : '我慢! -❤️'}
+            <div className="elabel-timer-bar">
+              <div className="elabel-timer-fill" style={{ width: `${(timeLeft / 6) * 100}%` }} />
+            </div>
+            <ComboDisplay combo={combo} multiplier={1 + combo * 0.15} />
+            <div className="elabel-scenario">
+              <p className="elabel-scene-text">{scenarios[current].scenario}</p>
+            </div>
+            <div className="elabel-options">
+              {scenarios[current].options.map((opt, i) => (
+                <button key={i}
+                  className={`elabel-opt ${selected === opt ? (opt === scenarios[current].answer ? 'correct' : 'wrong') : ''} ${selected && opt === scenarios[current].answer ? 'correct' : ''}`}
+                  onClick={() => answer(opt)}
+                  disabled={!!selected}
+                >{opt}</button>
+              ))}
+            </div>
+            {feedback && <span className={`tap-feedback ${feedback.type === 'correct' ? 'perfect' : 'miss'}`}>
+              {feedback.type === 'correct' ? `正解! +${feedback.pts}` : feedback.type === 'timeout' ? `時間切れ! 答: ${feedback.answer}` : `不正解! 答: ${feedback.answer}`}
             </span>}
-            <span className="breath-score" style={{ position: 'absolute', bottom: 16 }}>スコア: {score}/{total}</span>
+            <span className="breath-score">スコア: {score}</span>
           </div>
         )}
         {phase === 'done' && (
-          <GameResult
-            score={Math.round(pct)}
-            pct={pct}
-            gameId="focus"
-            label="%"
-            messages={FOCUS_MSGS}
-            onRetry={() => setPhase('ready')}
-            onComplete={onComplete}
-          />
+          <GameResult score={score} pct={pct} gameId="emotion-label" label="pt"
+            messages={ELABEL_MSGS}
+            onRetry={() => setPhase('ready')} onComplete={onComplete} />
         )}
       </div>
     </div>
@@ -1577,206 +1510,164 @@ function ZenCountGame({ onComplete, onBack }) {
   );
 }
 
-/* ── Game 8: Emotion Catch (Hard - 5 waves, lives, golden bonus, faster) ── */
-function EmotionCatchGame({ onComplete, onBack }) {
+/* ── Game 8: Mind Pair — ACT memory card matching (concept pairs) ── */
+const MIND_PAIRS = [
+  { concept: '観察', match: '思考を眺める' },
+  { concept: '受容', match: '抵抗しない' },
+  { concept: '脱フュージョン', match: '思考と距離を取る' },
+  { concept: 'マインドフルネス', match: '今この瞬間' },
+  { concept: '価値', match: '人生の方向性' },
+  { concept: 'コミットメント', match: '行動を選ぶ' },
+  { concept: 'セルフコンパッション', match: '自分への優しさ' },
+  { concept: 'レジリエンス', match: '回復力' },
+  { concept: 'フロー状態', match: '完全な没頭' },
+  { concept: 'メタ認知', match: '思考を思考する' },
+];
+
+function MindPairGame({ onComplete, onBack }) {
   const [phase, setPhase] = useState('ready');
-  const [items, setItems] = useState([]);
+  const [cards, setCards] = useState([]);
+  const [flipped, setFlipped] = useState([]);
+  const [matched, setMatched] = useState([]);
   const [score, setScore] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(50);
   const [combo, setCombo] = useState(0);
   const [maxCombo, setMaxCombo] = useState(0);
-  const [catches, setCatches] = useState(0);
-  const [totalAccept, setTotalAccept] = useState(0);
-  const [wave, setWave] = useState(1);
-  const [lives, setLives] = useState(5);
-  const [bursts, setBursts] = useState([]);
+  const [moves, setMoves] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(60);
   const [feedback, setFeedback] = useState(null);
-  const idRef = useRef(0);
-  const intervalRef = useRef(null);
+  const comboRef = useRef(0);
   const timerRef = useRef(null);
-  const burstIdRef = useRef(0);
-  const livesRef = useRef(5);
-
-  const GOLDEN_EMOTIONS = ['悟り', '覚醒', '至福', '解脱'];
+  const lockRef = useRef(false);
+  const PAIR_COUNT = 8;
 
   const startGame = () => {
-    setPhase('playing');
+    const selected = [...MIND_PAIRS].sort(() => Math.random() - 0.5).slice(0, PAIR_COUNT);
+    const cardSet = [];
+    selected.forEach((pair, idx) => {
+      cardSet.push({ id: idx * 2, pairId: idx, text: pair.concept, type: 'concept' });
+      cardSet.push({ id: idx * 2 + 1, pairId: idx, text: pair.match, type: 'match' });
+    });
+    cardSet.sort(() => Math.random() - 0.5);
+    setCards(cardSet);
+    setFlipped([]);
+    setMatched([]);
     setScore(0);
-    setTimeLeft(50);
+    comboRef.current = 0;
     setCombo(0);
     setMaxCombo(0);
-    setCatches(0);
-    setTotalAccept(0);
-    setWave(1);
-    setLives(5);
-    livesRef.current = 5;
-    setItems([]);
-    setBursts([]);
-    idRef.current = 0;
-    burstIdRef.current = 0;
-    startWave(1);
+    setMoves(0);
+    setTimeLeft(60);
+    lockRef.current = false;
+    setPhase('playing');
 
     timerRef.current = setInterval(() => {
       setTimeLeft(t => {
-        if (t <= 1 || livesRef.current <= 0) {
-          clearInterval(intervalRef.current);
+        if (t <= 1) {
           clearInterval(timerRef.current);
           setPhase('done');
           return 0;
         }
-        if (t === 41) setWave(2);
-        if (t === 32) setWave(3);
-        if (t === 22) setWave(4);
-        if (t === 12) setWave(5);
         return t - 1;
       });
     }, 1000);
   };
 
-  const startWave = (w) => {
-    clearInterval(intervalRef.current);
-    const rates = [800, 650, 500, 380, 280];
-    const speeds = [2800, 2400, 2000, 1700, 1400];
-    const spawnRate = rates[Math.min(w - 1, 4)];
-    const fallSpeed = speeds[Math.min(w - 1, 4)];
-    const resistChance = [0.40, 0.45, 0.50, 0.50, 0.55];
+  const flipCard = (card) => {
+    if (phase !== 'playing' || lockRef.current) return;
+    if (flipped.includes(card.id) || matched.includes(card.pairId)) return;
 
-    intervalRef.current = setInterval(() => {
-      if (livesRef.current <= 0) { clearInterval(intervalRef.current); return; }
-      const r = Math.random();
-      const isResist = r < resistChance[Math.min(w - 1, 4)];
-      // Golden bonus: 5% chance from wave 3+
-      const isGolden = !isResist && w >= 3 && Math.random() < 0.08;
+    const newFlipped = [...flipped, card.id];
+    setFlipped(newFlipped);
 
-      let word;
-      if (isGolden) {
-        word = GOLDEN_EMOTIONS[Math.floor(Math.random() * GOLDEN_EMOTIONS.length)];
-      } else if (isResist) {
-        word = EMOTION_ITEMS.resist[Math.floor(Math.random() * EMOTION_ITEMS.resist.length)];
-      } else {
-        word = EMOTION_ITEMS.accept[Math.floor(Math.random() * EMOTION_ITEMS.accept.length)];
-      }
+    if (newFlipped.length === 2) {
+      lockRef.current = true;
+      setMoves(m => m + 1);
+      const [firstId, secondId] = newFlipped;
+      const first = cards.find(c => c.id === firstId);
+      const second = cards.find(c => c.id === secondId);
 
-      const left = 5 + Math.random() * 75;
-      const id = ++idRef.current;
-      const isAccept = !isResist;
-      if (isAccept) setTotalAccept(n => n + 1);
-
-      setItems(prev => [...prev, { id, word, isAccept, isGolden, left, tapped: false, speed: fallSpeed }]);
-      setTimeout(() => {
-        setItems(prev => {
-          const item = prev.find(i => i.id === id);
-          if (item && !item.tapped && item.isAccept) {
-            // Missed a positive emotion = lose life
-            livesRef.current -= 1;
-            setLives(livesRef.current);
-            if (livesRef.current <= 0) {
-              clearInterval(intervalRef.current);
-              clearInterval(timerRef.current);
-              setPhase('done');
-            }
+      if (first.pairId === second.pairId) {
+        // Match!
+        const timeBonus = Math.round(timeLeft * 0.5);
+        const mult = 1 + comboRef.current * 0.2;
+        const pts = Math.round((30 + timeBonus) * mult);
+        setScore(s => s + pts);
+        comboRef.current += 1;
+        setCombo(comboRef.current);
+        setMaxCombo(prev => Math.max(prev, comboRef.current));
+        setMatched(prev => {
+          const next = [...prev, first.pairId];
+          if (next.length >= PAIR_COUNT) {
+            clearInterval(timerRef.current);
+            setTimeout(() => setPhase('done'), 600);
           }
-          return prev.filter(i => i.id !== id);
+          return next;
         });
-      }, fallSpeed);
-    }, spawnRate);
-  };
-
-  useEffect(() => {
-    if (phase === 'playing' && wave > 1) startWave(wave);
-  }, [wave]);
-
-  const tapItem = (item, e) => {
-    if (item.tapped) return;
-    setItems(prev => prev.map(i => i.id === item.id ? { ...i, tapped: true } : i));
-
-    const rect = e.currentTarget.getBoundingClientRect();
-    const bId = ++burstIdRef.current;
-    const burstColor = item.isGolden ? '#fbbf24' : item.isAccept ? '#4ade80' : '#ef4444';
-    setBursts(prev => [...prev, { id: bId, x: rect.left + rect.width / 2, y: rect.top + rect.height / 2, color: burstColor }]);
-    setTimeout(() => setBursts(prev => prev.filter(b => b.id !== bId)), 500);
-
-    if (item.isAccept) {
-      const mult = 1 + combo * 0.15;
-      const basePts = item.isGolden ? 50 : 15;
-      const pts = Math.round(basePts * mult);
-      setScore(s => s + pts);
-      setCatches(c => c + 1);
-      const newCombo = combo + 1;
-      setCombo(newCombo);
-      setMaxCombo(prev => Math.max(prev, newCombo));
-      setFeedback({ type: item.isGolden ? 'golden' : 'correct', pts });
-    } else {
-      setScore(s => Math.max(0, s - 10));
-      setCombo(0);
-      livesRef.current -= 1;
-      setLives(livesRef.current);
-      setFeedback({ type: 'wrong', pts: 0 });
-      if (livesRef.current <= 0) {
-        clearInterval(intervalRef.current);
-        clearInterval(timerRef.current);
-        setTimeout(() => setPhase('done'), 200);
+        setFeedback({ type: 'correct', pts, text: `${first.type === 'concept' ? first.text : second.text} = ${first.type === 'match' ? first.text : second.text}` });
+        setTimeout(() => { setFlipped([]); lockRef.current = false; setFeedback(null); }, 700);
+      } else {
+        // No match
+        comboRef.current = 0;
+        setCombo(0);
+        setFeedback({ type: 'wrong' });
+        setTimeout(() => { setFlipped([]); lockRef.current = false; setFeedback(null); }, 800);
       }
     }
-    setTimeout(() => setFeedback(null), 300);
   };
 
-  useEffect(() => () => {
-    clearInterval(intervalRef.current);
-    clearInterval(timerRef.current);
-  }, []);
+  useEffect(() => () => clearInterval(timerRef.current), []);
 
-  const pct = totalAccept > 0 ? Math.min(100, (catches / Math.max(1, totalAccept)) * 100) : 0;
+  const pct = PAIR_COUNT > 0 ? Math.min(100, (matched.length / PAIR_COUNT) * 100) : 0;
+  const efficiency = moves > 0 ? Math.min(100, Math.round((matched.length / moves) * 100)) : 0;
 
   return (
     <div className="game-screen" style={{ '--gc': '#22d3ee' }}>
-      <div className="gs-top"><BackBtn onClick={onBack} /><span className="gs-badge">🎪 感情キャッチ</span></div>
+      <div className="gs-top"><BackBtn onClick={onBack} /><span className="gs-badge">🃏 マインドペア</span></div>
       <div className="gs-body">
         {phase === 'ready' && (
           <div className="gs-center">
-            <span className="gs-big-icon">🎪</span>
-            <h2 className="gs-title">感情キャッチ</h2>
-            <p className="gs-desc">ポジティブ感情をキャッチ!<br/>ネガティブはスルー! 逃すとライフ減!<br/>5ウェーブ制。金色は高得点!</p>
+            <span className="gs-big-icon">🃏</span>
+            <h2 className="gs-title">マインドペア</h2>
+            <p className="gs-desc">ACTの概念とその意味をマッチング!<br/>カードをめくってペアを見つけよう<br/>60秒以内に{PAIR_COUNT}ペア完成せよ!</p>
             <button className="gs-start-btn" onClick={startGame}>スタート</button>
           </div>
         )}
         {phase === 'playing' && (
-          <div className="gs-play-field">
-            <div className="pend-hud">
-              <span className="pend-score">{score}pt</span>
-              <ComboDisplay combo={combo} multiplier={1 + combo * 0.15} />
-              <span className="pend-wave">W{wave}/5</span>
-              <span className="gs-lives">{'❤️'.repeat(Math.max(0, lives))}</span>
-              <span className="pend-time">{timeLeft}s</span>
+          <div className="gs-center mindpair-area">
+            <div className="mindpair-hud">
+              <span>{matched.length}/{PAIR_COUNT}ペア</span>
+              <span>{timeLeft}s</span>
+              <span>{moves}手</span>
             </div>
-            <div className="pend-arena emotion-arena">
-              {items.map(item => (
-                <div
-                  key={item.id}
-                  className={`emotion-item ${item.isGolden ? 'golden' : item.isAccept ? 'accept' : 'resist'} ${item.tapped ? 'caught' : ''}`}
-                  style={{ left: `${item.left}%`, animationDuration: `${item.speed}ms` }}
-                  onClick={(e) => tapItem(item, e)}
-                >
-                  {item.isGolden ? `✦${item.word}✦` : item.word}
-                </div>
-              ))}
+            <ComboDisplay combo={combo} multiplier={1 + combo * 0.2} />
+            <div className="mindpair-grid">
+              {cards.map(card => {
+                const isFlipped = flipped.includes(card.id) || matched.includes(card.pairId);
+                const isMatched = matched.includes(card.pairId);
+                return (
+                  <button key={card.id}
+                    className={`mindpair-card ${isFlipped ? 'flipped' : ''} ${isMatched ? 'matched' : ''} ${card.type}`}
+                    onClick={() => flipCard(card)}
+                    disabled={isMatched}
+                  >
+                    <span className="mindpair-card-inner">
+                      {isFlipped ? card.text : '?'}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
-            {feedback && <span className={`tap-feedback tap-feedback-fixed ${feedback.type === 'golden' ? 'perfect' : feedback.type === 'correct' ? 'perfect' : 'miss'}`}>
-              {feedback.type === 'golden' ? `✦覚醒! +${feedback.pts}` : feedback.type === 'correct' ? `受容! +${feedback.pts}` : '抵抗! -❤️'}
+            {feedback && <span className={`tap-feedback ${feedback.type === 'correct' ? 'perfect' : 'miss'}`}>
+              {feedback.type === 'correct' ? `${feedback.text} +${feedback.pts}` : 'ミスマッチ!'}
             </span>}
-            <HitBurst bursts={bursts} />
+            <span className="breath-score">スコア: {score}</span>
           </div>
         )}
         {phase === 'done' && (
-          <GameResult
-            score={score}
-            pct={pct}
-            gameId="emotion-catch"
-            label="pt"
-            messages={EMOTION_MSGS}
-            onRetry={startGame}
-            onComplete={onComplete}
-          />
+          <GameResult score={score} pct={matched.length >= PAIR_COUNT ? Math.max(efficiency, 60) : pct}
+            gameId="mind-pair" label="pt"
+            messages={PAIR_MSGS}
+            onRetry={() => setPhase('ready')} onComplete={onComplete} />
         )}
       </div>
     </div>
@@ -1787,12 +1678,12 @@ function EmotionCatchGame({ onComplete, onBack }) {
 const GAME_COMPONENTS = {
   'thought-stop': ThoughtStopGame,
   'reflex': ReflexGame,
-  'breath-surf': BreathSurfGame,
-  'pendulum': PendulumShooterGame,
-  'present-tap': PresentTapGame,
-  'focus': FocusGame,
+  'reframe': ReframeGame,
+  'stroop': StroopGame,
+  'efficacy': EfficacyGame,
+  'emotion-label': EmotionLabelGame,
   'zen-count': ZenCountGame,
-  'emotion-catch': EmotionCatchGame,
+  'mind-pair': MindPairGame,
 };
 
 /* ── Main ── */
