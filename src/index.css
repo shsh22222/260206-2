@@ -58,6 +58,23 @@ button{border:none;background:none;cursor:pointer;font:inherit;color:inherit;-we
 
 .main{padding:20px 14px;display:flex;flex-direction:column;gap:16px}
 
+/* ── Mode Toggle ── */
+.mode-toggle{
+  display:flex;gap:6px;padding:4px;background:rgba(255,255,255,.03);
+  border-radius:14px;border:1px solid rgba(255,255,255,.05);
+}
+.mode-btn{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:6px;
+  padding:12px 8px;border-radius:11px;font-size:.78rem;font-weight:500;
+  letter-spacing:.8px;transition:all var(--tr);color:var(--text3);
+}
+.mode-btn.active{
+  background:rgba(255,255,255,.06);color:var(--text);
+  box-shadow:0 2px 12px rgba(0,0,0,.2);
+}
+.mode-btn:active{transform:scale(.97)}
+.mode-icon{font-size:1rem}
+
 /* ── Prompt ── */
 .prompt{font-size:.75rem;color:var(--text3);letter-spacing:3px;text-align:center;padding:2px 0 0;font-weight:400}
 
@@ -92,6 +109,11 @@ button{border:none;background:none;cursor:pointer;font:inherit;color:inherit;-we
   position:absolute;top:6px;right:8px;font-size:.55rem;font-weight:700;
   color:var(--green);opacity:.6;transition:opacity var(--tr);
 }
+
+/* ── Game Grid ── */
+.game-grid{grid-template-columns:repeat(2,1fr)}
+.game-card{padding:22px 10px 18px}
+.game-card .dw-desc{font-size:.52rem}
 
 /* ── Wisdom Button (Home) ── */
 .wisdom-btn{
@@ -181,10 +203,12 @@ button{border:none;background:none;cursor:pointer;font:inherit;color:inherit;-we
 
 /* Step Area */
 .step-area{
-  flex:1;display:flex;align-items:center;justify-content:center;
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
   padding:20px 24px;text-align:center;
   animation:stepIn .6s cubic-bezier(.2,1,.3,1);
+  cursor:default;
 }
+.step-area.step-ready{cursor:pointer}
 @keyframes stepIn{
   from{opacity:0;transform:translateY(18px) scale(.97)}
   to{opacity:1;transform:translateY(0) scale(1)}
@@ -196,6 +220,16 @@ button{border:none;background:none;cursor:pointer;font:inherit;color:inherit;-we
   letter-spacing:.5px;
   font-weight:400;
 }
+
+/* Tap Prompt */
+.tap-prompt{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  margin-top:24px;
+  animation:tapPulse 2s ease infinite;
+}
+.tap-icon{color:var(--dc);opacity:.6}
+.tap-text{font-size:.6rem;color:var(--text3);letter-spacing:2px}
+@keyframes tapPulse{0%,100%{opacity:.6;transform:translateY(0)}50%{opacity:1;transform:translateY(4px)}}
 
 /* Bottom Area */
 .ps-bottom{
@@ -213,10 +247,6 @@ button{border:none;background:none;cursor:pointer;font:inherit;color:inherit;-we
   height:100%;background:var(--dc);border-radius:1px;
   transition:width 1s linear;
   opacity:.6;
-}
-.step-timer-num{
-  font-size:.6rem;font-weight:400;font-variant-numeric:tabular-nums;
-  color:rgba(255,255,255,.2);letter-spacing:1px;
 }
 
 /* Practice Buttons */
@@ -421,6 +451,264 @@ button{border:none;background:none;cursor:pointer;font:inherit;color:inherit;-we
 }
 .lu-title{font-size:1.15rem;font-weight:500;margin:10px 0;position:relative;letter-spacing:1px}
 .lu-msg{font-size:.72rem;color:var(--text2);margin-bottom:24px;position:relative;letter-spacing:.5px}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* ━━ GAME SCREENS ━━ */
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.game-screen{
+  min-height:100dvh;display:flex;flex-direction:column;
+  animation:fadeIn .4s ease;
+  user-select:none;-webkit-tap-highlight-color:transparent;
+  background:radial-gradient(ellipse at 50% 30%,color-mix(in srgb,var(--gc) 6%,transparent),transparent 60%);
+}
+.gs-top{
+  display:flex;align-items:center;gap:12px;
+  padding:20px 20px 8px;
+}
+.gs-badge{
+  font-size:.65rem;font-weight:500;letter-spacing:1px;
+  color:var(--gc);opacity:.7;
+}
+.gs-body{
+  flex:1;display:flex;flex-direction:column;
+  padding:0 20px 40px;
+}
+.gs-center{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:16px;text-align:center;
+}
+.gs-big-icon{font-size:3.5rem;margin-bottom:8px}
+.gs-title{
+  font-size:1.3rem;font-weight:700;letter-spacing:1.5px;
+  color:var(--gc);
+}
+.gs-desc{
+  font-size:.78rem;color:var(--text2);line-height:1.8;
+  letter-spacing:.3px;max-width:280px;
+}
+.gs-start-btn{
+  margin-top:12px;padding:16px 44px;border-radius:var(--rs);
+  font-size:.88rem;font-weight:600;letter-spacing:1px;
+  background:linear-gradient(135deg,var(--gc),color-mix(in srgb,var(--gc) 70%,#fff));
+  color:#fff;box-shadow:0 4px 20px color-mix(in srgb,var(--gc) 30%,transparent);
+  transition:all var(--tr);
+}
+.gs-start-btn:active{transform:scale(.95);box-shadow:0 2px 12px color-mix(in srgb,var(--gc) 40%,transparent)}
+
+/* Game Play Area */
+.gs-play-area{
+  position:relative;cursor:pointer;
+  padding:20px;border-radius:var(--r);min-height:60dvh;
+}
+.gs-timer-big{
+  font-size:4rem;font-weight:300;font-variant-numeric:tabular-nums;
+  color:var(--gc);letter-spacing:2px;
+}
+.gs-timer-unit{
+  font-size:.8rem;color:var(--text3);letter-spacing:2px;margin-top:-8px;
+}
+.gs-hint{
+  font-size:.65rem;color:var(--text3);letter-spacing:2px;
+  margin-top:16px;
+}
+.gs-round-num{
+  position:absolute;top:16px;left:16px;
+  font-size:.55rem;color:var(--text3);letter-spacing:1px;
+  font-variant-numeric:tabular-nums;
+}
+
+/* Game Results */
+.gs-result-num{
+  font-size:3.5rem;font-weight:300;color:var(--gc);
+  font-variant-numeric:tabular-nums;
+}
+.gs-result-num small{font-size:1rem;font-weight:400;margin-left:4px;opacity:.7}
+.gs-best-label{
+  font-size:.65rem;color:var(--text3);letter-spacing:1.5px;
+}
+.gs-msg{
+  font-size:.82rem;color:var(--text2);letter-spacing:.5px;
+  font-weight:500;
+}
+.gs-btns{
+  display:flex;gap:10px;margin-top:8px;
+}
+
+/* Reflex Game */
+.gs-dark{background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.03)}
+.gs-flash{
+  background:linear-gradient(135deg,var(--gc),color-mix(in srgb,var(--gc) 60%,#fff));
+  border-radius:var(--r);
+  animation:flashIn .15s ease;
+}
+@keyframes flashIn{from{opacity:0;transform:scale(1.1)}to{opacity:1;transform:scale(1)}}
+.gs-wait-text{font-size:1.2rem;color:var(--text3);letter-spacing:3px;font-weight:300}
+.gs-go-text{font-size:2rem;color:#fff;font-weight:700;letter-spacing:3px}
+.gs-early{color:var(--red);font-size:1.1rem;font-weight:700}
+
+/* Breath Surf */
+.breath-circle{
+  width:140px;height:140px;border-radius:50%;
+  border:2px solid var(--gc);
+  background:radial-gradient(circle,color-mix(in srgb,var(--gc) 15%,transparent),transparent 70%);
+  transition:transform .1s linear;
+  box-shadow:0 0 30px color-mix(in srgb,var(--gc) 20%,transparent);
+}
+.breath-label{
+  font-size:1rem;font-weight:500;color:var(--gc);
+  letter-spacing:3px;margin-top:20px;
+}
+.breath-score{
+  font-size:.6rem;color:var(--text3);letter-spacing:1px;
+  font-variant-numeric:tabular-nums;
+}
+
+/* Tap Feedback */
+.tap-feedback{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  font-size:1.2rem;font-weight:700;letter-spacing:1px;
+  animation:feedbackPop .4s ease forwards;
+  pointer-events:none;z-index:10;
+}
+.tap-feedback.perfect{color:var(--green)}
+.tap-feedback.good{color:var(--yellow)}
+.tap-feedback.miss{color:var(--red)}
+.tap-feedback.correct{color:var(--green)}
+.tap-feedback.wrong{color:var(--red)}
+.tap-feedback-fixed{
+  position:fixed;top:50%;left:50%;
+}
+@keyframes feedbackPop{
+  0%{opacity:1;transform:translate(-50%,-50%) scale(.5)}
+  50%{transform:translate(-50%,-50%) scale(1.2)}
+  100%{opacity:0;transform:translate(-50%,-70%) scale(1)}
+}
+
+/* Pendulum Shooter */
+.gs-play-field{
+  flex:1;display:flex;flex-direction:column;position:relative;
+}
+.pend-hud{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:8px 4px;
+}
+.pend-score{
+  font-size:.85rem;font-weight:700;color:var(--gc);
+  font-variant-numeric:tabular-nums;
+}
+.pend-time{
+  font-size:.75rem;font-weight:500;color:var(--text2);
+  font-variant-numeric:tabular-nums;letter-spacing:.5px;
+}
+.pend-arena{
+  flex:1;position:relative;overflow:hidden;min-height:65dvh;
+  border-radius:var(--r);
+  background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.03);
+}
+.pend-bubble{
+  position:absolute;
+  padding:10px 18px;border-radius:24px;
+  font-size:.78rem;font-weight:600;letter-spacing:.5px;
+  cursor:pointer;transition:transform .15s,opacity .15s;
+  white-space:nowrap;
+}
+.pend-bubble.neg{
+  background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.25);
+  color:#fca5a5;
+  animation:slideAcross 3.5s linear forwards;
+}
+.pend-bubble.pos{
+  background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.2);
+  color:#86efac;
+  animation:slideAcross 3.5s linear forwards;
+}
+.pend-bubble.from-right{animation-name:slideAcrossR}
+.pend-bubble.hit{
+  transform:scale(0)!important;opacity:0!important;
+  transition:all .2s ease;
+}
+@keyframes slideAcross{
+  0%{left:-80px;opacity:0}
+  5%{opacity:1}
+  90%{opacity:1}
+  100%{left:calc(100% + 80px);opacity:0}
+}
+@keyframes slideAcrossR{
+  0%{right:-80px;left:auto;opacity:0}
+  5%{opacity:1}
+  90%{opacity:1}
+  100%{right:calc(100% + 80px);left:auto;opacity:0}
+}
+
+/* Present Tap */
+.present-word{
+  font-size:2.8rem;font-weight:700;color:var(--gc);
+  letter-spacing:4px;
+  animation:wordIn .3s ease;
+}
+.present-score{
+  font-size:.6rem;color:var(--text3);letter-spacing:1px;
+  font-variant-numeric:tabular-nums;margin-top:8px;
+}
+@keyframes wordIn{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
+
+/* Focus Trainer */
+.focus-dot{
+  width:80px;height:80px;border-radius:50%;
+  transition:all .3s ease;
+}
+.focus-dot.green{
+  background:radial-gradient(circle,var(--green),color-mix(in srgb,var(--green) 40%,transparent));
+  box-shadow:0 0 40px color-mix(in srgb,var(--green) 30%,transparent);
+  animation:dotAppear .25s ease;
+}
+.focus-dot.red{
+  background:radial-gradient(circle,var(--red),color-mix(in srgb,var(--red) 40%,transparent));
+  box-shadow:0 0 40px color-mix(in srgb,var(--red) 30%,transparent);
+  animation:dotAppear .25s ease;
+}
+.focus-dot.dim{
+  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);
+}
+@keyframes dotAppear{from{transform:scale(0)}to{transform:scale(1)}}
+
+/* Zen Count */
+.zen-count-num{
+  font-size:5rem;font-weight:200;color:var(--gc);
+  font-variant-numeric:tabular-nums;
+  transition:all .2s ease;
+}
+.zen-count-label{
+  font-size:1rem;color:var(--text3);letter-spacing:2px;margin-top:-8px;
+}
+
+/* Emotion Catch */
+.emotion-arena{overflow:hidden}
+.emotion-item{
+  position:absolute;
+  padding:8px 16px;border-radius:20px;
+  font-size:.75rem;font-weight:600;letter-spacing:.5px;
+  cursor:pointer;white-space:nowrap;
+  animation:emotionFall 3s ease-in forwards;
+}
+.emotion-item.accept{
+  background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.2);
+  color:#86efac;
+}
+.emotion-item.resist{
+  background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.2);
+  color:#fca5a5;
+}
+.emotion-item.caught{
+  transform:scale(0)!important;opacity:0!important;
+  transition:all .2s ease;
+}
+@keyframes emotionFall{
+  0%{top:-40px;opacity:0}
+  8%{opacity:1}
+  85%{opacity:1}
+  100%{top:calc(100% + 40px);opacity:0}
+}
 
 /* ── Animations ── */
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
