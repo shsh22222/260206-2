@@ -21,6 +21,7 @@ export function load() {
         p.todayDoorways = [];
         p.todayDate = today;
       }
+      if (!p.wisdomSeen) p.wisdomSeen = [];
       return p;
     }
   } catch {}
@@ -30,6 +31,7 @@ export function load() {
     totalActions: 0,
     todayDoorways: [],
     todayDate: today,
+    wisdomSeen: [],
   };
 }
 

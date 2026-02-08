@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { DOORWAYS, DAILY_WISDOM, TEACHER_COLORS, TEACHER_LABELS } from './data/transurfingData';
+import { DOORWAYS, WISDOM, TEACHER_COLORS, TEACHER_LABELS } from './data/transurfingData';
 import { load, save, addXP, getTitle } from './store/gameStore';
 
 /* ── Particles ── */
@@ -45,34 +45,11 @@ function TeacherTag({ teacher }) {
   );
 }
 
-/* ── Daily Wisdom ── */
-function DailyWisdom({ onXP }) {
-  const [accepted, setAccepted] = useState(false);
-  const todayIdx = Math.floor(Date.now() / 86400000) % DAILY_WISDOM.length;
-  const wisdom = DAILY_WISDOM[todayIdx];
-
-  const accept = () => { if (!accepted) { onXP(5); setAccepted(true); } };
-
-  return (
-    <div className="daily-card glass" onClick={accept}>
-      <p className="daily-text">{wisdom.text}</p>
-      <div className="daily-footer">
-        <TeacherTag teacher={wisdom.teacher} />
-        {!accepted && <span className="daily-tap">tap +5XP</span>}
-        {accepted && <span className="daily-done">✓</span>}
-      </div>
-    </div>
-  );
-}
-
-/* ── Practice Screen ── */
+/* ── Practice Screen (FOCUSED) ── */
 function PracticeScreen({ doorway, onComplete, onBack }) {
   const initP = useRef(Math.floor(Math.random() * doorway.practices.length));
-  const initW = useRef(Math.floor(Math.random() * doorway.words.length));
   const [pIdx, setPIdx] = useState(initP.current);
-  const [wIdx, setWIdx] = useState(initW.current);
   const practice = doorway.practices[pIdx];
-  const word = doorway.words[wIdx];
 
   const [timer, setTimer] = useState(practice.duration);
   const [timerDone, setTimerDone] = useState(false);
@@ -86,9 +63,7 @@ function PracticeScreen({ doorway, onComplete, onBack }) {
 
   const shuffle = () => {
     const newP = (pIdx + 1) % doorway.practices.length;
-    const newW = (wIdx + 1) % doorway.words.length;
     setPIdx(newP);
-    setWIdx(newW);
     setTimer(doorway.practices[newP].duration);
     setTimerDone(false);
   };
@@ -101,27 +76,21 @@ function PracticeScreen({ doorway, onComplete, onBack }) {
     <div className="practice-screen" style={{ '--dc': doorway.color }}>
       <button className="back-btn" onClick={onBack}>← 戻る</button>
 
-      <div className="practice-hero">
-        <span className="hero-icon">{doorway.icon}</span>
-        <h2 className="hero-name">{doorway.name}</h2>
-        <p className="hero-desc">{doorway.desc}</p>
+      <div className="practice-top">
+        <span className="practice-top-icon">{doorway.icon}</span>
+        <span className="practice-top-name">{doorway.name}</span>
       </div>
 
-      <div className="wisdom-card glass">
-        <p className="wisdom-text">{word.text}</p>
-        <TeacherTag teacher={word.teacher} />
-      </div>
-
-      <div className="guide-card glass">
-        <span className="guide-label">{practice.name}</span>
-        <p className="guide-text">{practice.guide}</p>
+      <div className="practice-focus glass">
+        <span className="pf-label">{practice.name}</span>
+        <p className="pf-guide">{practice.guide}</p>
       </div>
 
       <div className="timer-area">
         <div className="timer-ring">
           <svg viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r="44" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="3" />
-            <circle cx="50" cy="50" r="44" fill="none" stroke="var(--dc)" strokeWidth="3"
+            <circle cx="50" cy="50" r="44" fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="2.5" />
+            <circle cx="50" cy="50" r="44" fill="none" stroke="var(--dc)" strokeWidth="2.5"
               strokeDasharray={`${pct * 2.764} 276.4`} strokeLinecap="round" transform="rotate(-90 50 50)" />
           </svg>
           <span className="timer-num">{timerDone ? '✓' : timer}</span>
@@ -141,9 +110,59 @@ function PracticeScreen({ doorway, onComplete, onBack }) {
   );
 }
 
+/* ── Wisdom Screen ── */
+function WisdomScreen({ wisdomSeen, onRead, onBack }) {
+  const [idx, setIdx] = useState(() => Math.floor(Math.random() * WISDOM.length));
+  const [fading, setFading] = useState(false);
+  const wisdom = WISDOM[idx];
+  const isNew = !wisdomSeen.includes(wisdom.id);
+
+  const next = () => {
+    setFading(true);
+    setTimeout(() => {
+      let newIdx;
+      do { newIdx = Math.floor(Math.random() * WISDOM.length); } while (newIdx === idx && WISDOM.length > 1);
+      setIdx(newIdx);
+      const w = WISDOM[newIdx];
+      if (!wisdomSeen.includes(w.id)) onRead(w.id, 3);
+      setFading(false);
+    }, 200);
+  };
+
+  const handleFirst = () => {
+    if (isNew) onRead(wisdom.id, 3);
+    next();
+  };
+
+  return (
+    <div className="wisdom-screen">
+      <div className="wisdom-top-bar">
+        <button className="back-btn" onClick={onBack}>← 戻る</button>
+        <span className="wisdom-count">{wisdomSeen.length}/{WISDOM.length}</span>
+      </div>
+
+      <div className="wisdom-hero">
+        <span className="wisdom-hero-icon">✦</span>
+        <h2 className="wisdom-hero-title">叡智</h2>
+        <p className="wisdom-hero-sub">意識を深める言葉たち</p>
+      </div>
+
+      <div className={`wisdom-main glass ${fading ? 'fade-out' : 'fade-in'}`}>
+        <p className="wm-text">{wisdom.text}</p>
+        <TeacherTag teacher={wisdom.teacher} />
+      </div>
+
+      <button className="btn-next" onClick={handleFirst}>
+        次のカード
+      </button>
+    </div>
+  );
+}
+
 /* ── Main ── */
 export default function App() {
   const [state, setState] = useState(load);
+  const [view, setView] = useState('home');
   const [activeDoorway, setActiveDoorway] = useState(null);
   const [toast, setToast] = useState(null);
   const [levelUp, setLevelUp] = useState(null);
@@ -154,16 +173,6 @@ export default function App() {
     clearTimeout(tt.current);
     tt.current = setTimeout(() => setToast(null), 1200);
   }, []);
-
-  const handleXP = useCallback((amount) => {
-    setState(prev => {
-      const old = prev.level;
-      const next = addXP(prev, amount);
-      if (next.level > old) setLevelUp(next.level);
-      return next;
-    });
-    showToast(amount);
-  }, [showToast]);
 
   const handleComplete = useCallback((doorwayId, amount) => {
     setState(prev => {
@@ -180,8 +189,25 @@ export default function App() {
       return s;
     });
     showToast(amount);
+    setView('home');
     setActiveDoorway(null);
   }, [showToast]);
+
+  const handleWisdomRead = useCallback((wisdomId, amount) => {
+    setState(prev => {
+      const seen = prev.wisdomSeen || [];
+      if (seen.includes(wisdomId)) return prev;
+      const old = prev.level;
+      const next = addXP(prev, amount);
+      if (next.level > old) setLevelUp(next.level);
+      const s = { ...next, wisdomSeen: [...seen, wisdomId] };
+      save(s);
+      return s;
+    });
+    showToast(amount);
+  }, [showToast]);
+
+  const openDoorway = (dw) => { setActiveDoorway(dw); setView('practice'); };
 
   const xpPct = (state.xp / state.xpNext) * 100;
   const todayDone = state.todayDoorways || [];
@@ -190,13 +216,23 @@ export default function App() {
     <div className="app">
       <Particles />
 
-      {activeDoorway ? (
+      {view === 'practice' && activeDoorway && (
         <PracticeScreen
           doorway={activeDoorway}
           onComplete={(amount) => handleComplete(activeDoorway.id, amount)}
-          onBack={() => setActiveDoorway(null)}
+          onBack={() => { setView('home'); setActiveDoorway(null); }}
         />
-      ) : (
+      )}
+
+      {view === 'wisdom' && (
+        <WisdomScreen
+          wisdomSeen={state.wisdomSeen || []}
+          onRead={handleWisdomRead}
+          onBack={() => setView('home')}
+        />
+      )}
+
+      {view === 'home' && (
         <>
           <header className="header glass">
             <div>
@@ -215,8 +251,6 @@ export default function App() {
           </div>
 
           <main className="main">
-            <DailyWisdom onXP={handleXP} />
-
             <p className="prompt">今、何が響く？</p>
 
             <div className="doorway-grid">
@@ -224,7 +258,7 @@ export default function App() {
                 <button
                   key={dw.id}
                   className={`doorway-card glass ${todayDone.includes(dw.id) ? 'done' : ''}`}
-                  onClick={() => setActiveDoorway(dw)}
+                  onClick={() => openDoorway(dw)}
                   style={{ '--dc': dw.color }}
                 >
                   <span className="dw-icon">{dw.icon}</span>
@@ -233,6 +267,12 @@ export default function App() {
                 </button>
               ))}
             </div>
+
+            <button className="wisdom-btn glass" onClick={() => setView('wisdom')}>
+              <span className="wb-icon">✦</span>
+              <span className="wb-label">叡智カードを引く</span>
+              <span className="wb-count">{(state.wisdomSeen || []).length}/{WISDOM.length}</span>
+            </button>
 
             <div className="stats glass">
               <div className="st"><span className="sv">{state.totalActions}</span><span className="sl">Actions</span></div>
