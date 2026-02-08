@@ -522,3 +522,104 @@ export const TEACHER_LABELS = {
   Zeland: 'ヴァジム・ゼランド',
   Universal: '普遍的叡智',
 };
+
+// ── Consciousness Diagnosis ──
+// MBTI-style 5-question flow → maps to a consciousness type → recommended doorways
+export const DIAGNOSIS_QUESTIONS = [
+  {
+    q: '今、一番近い状態は？',
+    opts: [
+      { text: '頭がぐるぐる回っている', scores: { thoughts: 3, silence: 2 } },
+      { text: '体が緊張・疲れている', scores: { body: 3, breath: 2 } },
+      { text: '感情に振り回されている', scores: { emotion: 3, accept: 2 } },
+      { text: '何となくモヤモヤする', scores: { letgo: 3, observer: 1 } },
+    ],
+  },
+  {
+    q: 'ストレスを感じた時、どうなりやすい？',
+    opts: [
+      { text: '考えすぎて止まらない', scores: { thoughts: 2, silence: 2 } },
+      { text: '体に出る（肩こり・頭痛）', scores: { body: 2, space: 2 } },
+      { text: '感情が爆発 or 抑え込む', scores: { emotion: 2, accept: 1 } },
+      { text: '何もやる気がなくなる', scores: { gratitude: 2, intention: 2 } },
+    ],
+  },
+  {
+    q: '今、一番欲しいものは？',
+    opts: [
+      { text: '心の静けさ', scores: { silence: 3, breath: 1 } },
+      { text: '感情の安定', scores: { emotion: 2, accept: 2 } },
+      { text: '自分を変えたい・前に進みたい', scores: { intention: 3, observer: 1 } },
+      { text: '今を楽しむ力', scores: { senses: 2, gratitude: 2 } },
+    ],
+  },
+  {
+    q: '以下のうち、共感するのは？',
+    opts: [
+      { text: '「考えすぎる自分をやめたい」', scores: { thoughts: 2, observer: 2 } },
+      { text: '「手放したいのに手放せない」', scores: { letgo: 3, accept: 1 } },
+      { text: '「もっと体の声を聞きたい」', scores: { body: 2, space: 2 } },
+      { text: '「感謝できる自分でいたい」', scores: { gratitude: 3, senses: 1 } },
+    ],
+  },
+  {
+    q: '直感で選んで',
+    opts: [
+      { text: '🌊 流れに身を任せる', scores: { letgo: 2, accept: 2 } },
+      { text: '🔥 内なる力を目覚めさせる', scores: { intention: 2, space: 2 } },
+      { text: '👁 本当の自分を見る', scores: { observer: 3, silence: 1 } },
+      { text: '✨ 今この瞬間を味わう', scores: { senses: 2, breath: 2 } },
+    ],
+  },
+];
+
+export const CONSCIOUSNESS_TYPES = [
+  {
+    id: 'thinker',
+    name: '思考旅人',
+    icon: '☁️',
+    doorways: ['thoughts', 'silence', 'observer'],
+    desc: '思考の海を泳ぐあなた。考えることは得意だけど、そこに飲まれやすい。思考と距離を取り、静寂の中の自分に出会うことで、本来の明晰さが目覚める。',
+    color: '#8b5cf6',
+  },
+  {
+    id: 'feeler',
+    name: '感情共鳴者',
+    icon: '🔥',
+    doorways: ['emotion', 'accept', 'breath'],
+    desc: '感情の波を深く感じるあなた。共感力が高い分、感情に揺さぶられやすい。感情を安全に処理し、受容する力を育てることで、感受性が最大の武器になる。',
+    color: '#ef4444',
+  },
+  {
+    id: 'seeker',
+    name: '覚醒探求者',
+    icon: '👁',
+    doorways: ['observer', 'intention', 'space'],
+    desc: '深い真実を求めるあなた。「本当の自分」への問いが止まらない。観察者の視座とエネルギーの体感を通じて、探求そのものが答えであることに気づく。',
+    color: '#a855f7',
+  },
+  {
+    id: 'holder',
+    name: '抱え込みの守護者',
+    icon: '💧',
+    doorways: ['letgo', 'body', 'accept'],
+    desc: '責任感が強く、全部自分で背負おうとするあなた。手放すことは弱さではなく、最も勇気ある選択。体の感覚に戻り、握っているものをそっと開く練習を。',
+    color: '#22d3ee',
+  },
+  {
+    id: 'sensor',
+    name: '感覚の覚者',
+    icon: '✨',
+    doorways: ['senses', 'gratitude', 'breath'],
+    desc: '五感が鋭く、今を味わう力を持つあなた。その感覚をさらに磨くと、日常のすべてが瞑想になる。感謝と呼吸を通じて、存在の奇跡に気づき続ける人へ。',
+    color: '#ec4899',
+  },
+  {
+    id: 'creator',
+    name: '意図の創造者',
+    icon: '🎯',
+    doorways: ['intention', 'gratitude', 'space'],
+    desc: 'ビジョンを描き、現実を創る力を持つあなた。意図を明確にしつつ結果を手放す——この矛盾を体得すると、あなたの想像力は現実の設計図になる。',
+    color: '#f472b6',
+  },
+];

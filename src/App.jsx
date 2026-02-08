@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { DOORWAYS, WISDOM, TEACHER_COLORS, TEACHER_LABELS } from './data/transurfingData';
+import { DOORWAYS, WISDOM, TEACHER_COLORS, TEACHER_LABELS, DIAGNOSIS_QUESTIONS, CONSCIOUSNESS_TYPES } from './data/transurfingData';
 import { load, save, addXP, getTitle } from './store/gameStore';
 
 /* ── Particles ── */
@@ -188,11 +188,106 @@ function WisdomScreen({ wisdomSeen, onRead, onBack }) {
   );
 }
 
+/* ── Diagnosis Screen ── */
+function DiagnosisScreen({ onResult, onBack }) {
+  const [qIdx, setQIdx] = useState(0);
+  const [scores, setScores] = useState({});
+  const [fadeKey, setFadeKey] = useState(0);
+  const question = DIAGNOSIS_QUESTIONS[qIdx];
+
+  const handleAnswer = (opt) => {
+    const next = { ...scores };
+    for (const [k, v] of Object.entries(opt.scores)) {
+      next[k] = (next[k] || 0) + v;
+    }
+    setScores(next);
+
+    if (qIdx < DIAGNOSIS_QUESTIONS.length - 1) {
+      setQIdx(qIdx + 1);
+      setFadeKey(k => k + 1);
+    } else {
+      // Calculate type
+      const typeScores = CONSCIOUSNESS_TYPES.map(ct => {
+        const total = ct.doorways.reduce((sum, dw) => sum + (next[dw] || 0), 0);
+        return { type: ct, score: total };
+      });
+      typeScores.sort((a, b) => b.score - a.score);
+      onResult(typeScores[0].type);
+    }
+  };
+
+  return (
+    <div className="diag-screen">
+      <div className="diag-top-bar">
+        <button className="back-btn" onClick={onBack}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
+        <div className="diag-progress-dots">
+          {DIAGNOSIS_QUESTIONS.map((_, i) => (
+            <span key={i} className={`diag-dot ${i < qIdx ? 'done' : ''} ${i === qIdx ? 'active' : ''}`} />
+          ))}
+        </div>
+        <span className="diag-num">{qIdx + 1}/{DIAGNOSIS_QUESTIONS.length}</span>
+      </div>
+
+      <div className="diag-body" key={fadeKey}>
+        <p className="diag-q">{question.q}</p>
+        <div className="diag-opts">
+          {question.opts.map((opt, i) => (
+            <button key={i} className="diag-opt glass" onClick={() => handleAnswer(opt)}>
+              {opt.text}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Diagnosis Result Screen ── */
+function DiagResultScreen({ type, onPractice, onBack }) {
+  const doorways = type.doorways.map(id => DOORWAYS.find(d => d.id === id));
+
+  return (
+    <div className="diag-result-screen">
+      <div className="diag-top-bar">
+        <button className="back-btn" onClick={onBack}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
+      </div>
+
+      <div className="dr-hero" style={{ '--dc': type.color }}>
+        <span className="dr-icon">{type.icon}</span>
+        <h2 className="dr-name">{type.name}</h2>
+        <p className="dr-desc">{type.desc}</p>
+      </div>
+
+      <div className="dr-section">
+        <p className="dr-label">おすすめのワーク</p>
+        <div className="dr-doorways">
+          {doorways.map(dw => (
+            <button key={dw.id} className="dr-dw glass" style={{ '--dc': dw.color }} onClick={() => onPractice(dw)}>
+              <span className="dr-dw-icon">{dw.icon}</span>
+              <div className="dr-dw-info">
+                <span className="dr-dw-name">{dw.name}</span>
+                <span className="dr-dw-desc">{dw.desc}</span>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <button className="btn-diag-retry" onClick={onBack}>もう一度診断する</button>
+    </div>
+  );
+}
+
 /* ── Main ── */
 export default function App() {
   const [state, setState] = useState(load);
   const [view, setView] = useState('home');
   const [activeDoorway, setActiveDoorway] = useState(null);
+  const [diagResult, setDiagResult] = useState(null);
   const [toast, setToast] = useState(null);
   const [levelUp, setLevelUp] = useState(null);
   const tt = useRef(null);
@@ -249,7 +344,7 @@ export default function App() {
         <PracticeScreen
           doorway={activeDoorway}
           onComplete={(amount) => handleComplete(activeDoorway.id, amount)}
-          onBack={() => { setView('home'); setActiveDoorway(null); }}
+          onBack={() => { setView(diagResult ? 'diagresult' : 'home'); setActiveDoorway(null); }}
         />
       )}
 
@@ -258,6 +353,21 @@ export default function App() {
           wisdomSeen={state.wisdomSeen || []}
           onRead={handleWisdomRead}
           onBack={() => setView('home')}
+        />
+      )}
+
+      {view === 'diagnosis' && (
+        <DiagnosisScreen
+          onResult={(type) => { setDiagResult(type); setView('diagresult'); }}
+          onBack={() => setView('home')}
+        />
+      )}
+
+      {view === 'diagresult' && diagResult && (
+        <DiagResultScreen
+          type={diagResult}
+          onPractice={(dw) => openDoorway(dw)}
+          onBack={() => { setDiagResult(null); setView('diagnosis'); }}
         />
       )}
 
@@ -302,6 +412,14 @@ export default function App() {
               <span className="wb-icon">✦</span>
               <span className="wb-label">叡智カードを引く</span>
               <span className="wb-count">{(state.wisdomSeen || []).length}/{WISDOM.length}</span>
+            </button>
+
+            <button className="diag-btn glass" onClick={() => setView('diagnosis')}>
+              <span className="db-icon">🔮</span>
+              <div className="db-text">
+                <span className="db-label">意識タイプ診断</span>
+                <span className="db-sub">5つの質問で、今のあなたに最適なワークを見つける</span>
+              </div>
             </button>
 
             <div className="stats glass">
