@@ -45,56 +45,54 @@ function TeacherTag({ teacher }) {
   );
 }
 
-/* ── Practice Screen (Step-by-Step) ── */
+/* ── Practice Screen (Auto-Advancing Steps) ── */
 function PracticeScreen({ doorway, onComplete, onBack }) {
   const initP = useRef(Math.floor(Math.random() * doorway.practices.length));
   const [pIdx, setPIdx] = useState(initP.current);
   const practice = doorway.practices[pIdx];
-  const steps = practice.guide.split('\n\n');
+  const steps = practice.steps;
 
   const [step, setStep] = useState(0);
   const [stepKey, setStepKey] = useState(0);
-  const [timer, setTimer] = useState(practice.duration);
-  const [timerDone, setTimerDone] = useState(false);
+  const [secLeft, setSecLeft] = useState(steps[0].sec);
+  const [allDone, setAllDone] = useState(false);
   const isLast = step >= steps.length - 1;
 
-  // Timer runs only on last step
+  // Auto-advance timer — counts down each step's sec, then advances
   useEffect(() => {
-    if (!isLast || timerDone) return;
-    if (timer <= 0) { setTimerDone(true); return; }
-    const t = setTimeout(() => setTimer(v => v - 1), 1000);
-    return () => clearTimeout(t);
-  }, [timer, timerDone, isLast]);
-
-  const advance = () => {
-    if (!isLast) {
-      setStep(s => s + 1);
-      setStepKey(k => k + 1);
+    if (allDone) return;
+    if (secLeft <= 0) {
+      if (isLast) {
+        setAllDone(true);
+      } else {
+        const next = step + 1;
+        setStep(next);
+        setStepKey(k => k + 1);
+        setSecLeft(steps[next].sec);
+      }
+      return;
     }
-  };
+    const t = setTimeout(() => setSecLeft(v => v - 1), 1000);
+    return () => clearTimeout(t);
+  }, [secLeft, allDone, isLast, step, steps]);
 
   const shuffle = () => {
     const newP = (pIdx + 1) % doorway.practices.length;
+    const newPractice = doorway.practices[newP];
     setPIdx(newP);
     setStep(0);
     setStepKey(k => k + 1);
-    setTimer(doorway.practices[newP].duration);
-    setTimerDone(false);
+    setSecLeft(newPractice.steps[0].sec);
+    setAllDone(false);
   };
 
-  const pct = practice.duration > 0
-    ? Math.min(100, ((practice.duration - timer) / practice.duration) * 100)
-    : 100;
-
-  const handleTap = (e) => {
-    if (e.target.closest('.ps-btns') || e.target.closest('.back-btn')) return;
-    advance();
-  };
+  const stepSec = steps[step].sec;
+  const pct = stepSec > 0 ? Math.min(100, ((stepSec - secLeft) / stepSec) * 100) : 100;
 
   return (
-    <div className="practice-screen" style={{ '--dc': doorway.color }} onClick={handleTap}>
+    <div className="practice-screen" style={{ '--dc': doorway.color }}>
       <div className="ps-top-bar">
-        <button className="back-btn" onClick={(e) => { e.stopPropagation(); onBack(); }}>←</button>
+        <button className="back-btn" onClick={onBack}>←</button>
         <div className="step-dots">
           {steps.map((_, i) => (
             <span key={i} className={`step-dot ${i <= step ? 'active' : ''}`} />
@@ -106,40 +104,30 @@ function PracticeScreen({ doorway, onComplete, onBack }) {
         <span className="ps-icon">{doorway.icon}</span>
         <span className="ps-name">{doorway.name}</span>
         <span className="ps-label">{practice.name}</span>
+        <span className="ps-source">{practice.source}</span>
       </div>
 
       <div className="step-area" key={stepKey}>
-        <p className="step-text">{steps[step]}</p>
+        <p className="step-text">{steps[step].text}</p>
       </div>
 
-      <div className="ps-bottom" onClick={e => e.stopPropagation()}>
-        {!isLast && (
-          <p className="step-hint">タップして次へ</p>
+      <div className="ps-bottom">
+        {!allDone && (
+          <>
+            <div className="step-progress">
+              <div className="step-progress-fill" style={{ width: `${pct}%` }} />
+            </div>
+            <span className="step-timer-num">{secLeft}</span>
+          </>
         )}
 
-        {isLast && (
-          <>
-            <div className="timer-area">
-              <div className="timer-ring">
-                <svg viewBox="0 0 100 100">
-                  <circle cx="50" cy="50" r="44" fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="2.5" />
-                  <circle cx="50" cy="50" r="44" fill="none" stroke="var(--dc)" strokeWidth="2.5"
-                    strokeDasharray={`${pct * 2.764} 276.4`} strokeLinecap="round" transform="rotate(-90 50 50)" />
-                </svg>
-                <span className="timer-num">{timerDone ? '✓' : timer}</span>
-              </div>
-            </div>
-
-            <div className="ps-btns">
-              <button className="btn-shuffle" onClick={shuffle}>別のワーク</button>
-              <button
-                className={`btn-done ${timerDone ? 'glow' : ''}`}
-                onClick={() => onComplete(15)}
-              >
-                {timerDone ? '完了 +15XP' : '完了する'}
-              </button>
-            </div>
-          </>
+        {allDone && (
+          <div className="ps-btns">
+            <button className="btn-shuffle" onClick={shuffle}>別のワーク</button>
+            <button className="btn-done glow" onClick={() => onComplete(15)}>
+              完了 +15XP
+            </button>
+          </div>
         )}
       </div>
     </div>

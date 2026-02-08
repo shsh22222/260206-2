@@ -105,6 +105,7 @@ button{border:none;background:none;cursor:pointer;font:inherit;color:inherit}
 .ps-icon{font-size:1.6rem;display:block;margin-bottom:6px}
 .ps-name{font-size:.9rem;font-weight:700;color:var(--dc);display:block;letter-spacing:.5px}
 .ps-label{font-size:.55rem;color:var(--text3);letter-spacing:2px;margin-top:4px;display:block}
+.ps-source{font-size:.5rem;color:var(--text3);letter-spacing:1px;margin-top:6px;display:block;opacity:.6}
 
 /* Step Area */
 .step-area{
@@ -128,20 +129,18 @@ button{border:none;background:none;cursor:pointer;font:inherit;color:inherit}
   padding:8px 0 28px;
   display:flex;flex-direction:column;align-items:center;gap:14px;
 }
-.step-hint{
-  font-size:.65rem;color:var(--text3);letter-spacing:2px;
-  animation:hintPulse 2.5s ease infinite;
+/* Step Progress Bar */
+.step-progress{
+  width:120px;height:3px;background:rgba(255,255,255,.08);
+  border-radius:2px;overflow:hidden;
 }
-@keyframes hintPulse{0%,100%{opacity:.5}50%{opacity:1}}
-
-/* Timer */
-.timer-area{display:flex;justify-content:center;padding:0}
-.timer-ring{position:relative;width:72px;height:72px}
-.timer-ring svg{width:100%;height:100%}
-.timer-ring circle:last-of-type{transition:stroke-dasharray .5s ease}
-.timer-num{
-  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  font-size:1.1rem;font-weight:700;font-variant-numeric:tabular-nums;color:rgba(255,255,255,.6);
+.step-progress-fill{
+  height:100%;background:var(--dc);border-radius:2px;
+  transition:width 1s linear;
+}
+.step-timer-num{
+  font-size:.7rem;font-weight:600;font-variant-numeric:tabular-nums;
+  color:rgba(255,255,255,.35);margin-top:2px;
 }
 
 /* Practice Buttons */
