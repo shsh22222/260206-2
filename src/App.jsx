@@ -5,13 +5,13 @@ import { load, save, addXP, getTitle } from './store/gameStore';
 /* ── Particles ── */
 function Particles() {
   return (
-    <div className="particles">{Array.from({ length: 14 }, (_, i) => (
+    <div className="particles">{Array.from({ length: 18 }, (_, i) => (
       <div key={i} className="particle" style={{
         left: `${Math.random() * 100}%`,
-        animationDelay: `${Math.random() * 8}s`,
-        animationDuration: `${6 + Math.random() * 8}s`,
-        opacity: 0.1 + Math.random() * 0.15,
-        width: `${2 + Math.random() * 3}px`, height: `${2 + Math.random() * 3}px`,
+        animationDelay: `${Math.random() * 10}s`,
+        animationDuration: `${8 + Math.random() * 10}s`,
+        opacity: 0.06 + Math.random() * 0.12,
+        width: `${1.5 + Math.random() * 2.5}px`, height: `${1.5 + Math.random() * 2.5}px`,
       }} />
     ))}</div>
   );
@@ -58,7 +58,6 @@ function PracticeScreen({ doorway, onComplete, onBack }) {
   const [allDone, setAllDone] = useState(false);
   const isLast = step >= steps.length - 1;
 
-  // Auto-advance timer — counts down each step's sec, then advances
   useEffect(() => {
     if (allDone) return;
     if (secLeft <= 0) {
@@ -92,18 +91,22 @@ function PracticeScreen({ doorway, onComplete, onBack }) {
   return (
     <div className="practice-screen" style={{ '--dc': doorway.color }}>
       <div className="ps-top-bar">
-        <button className="back-btn" onClick={onBack}>←</button>
+        <button className="back-btn" onClick={onBack}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
         <div className="step-dots">
           {steps.map((_, i) => (
-            <span key={i} className={`step-dot ${i <= step ? 'active' : ''}`} />
+            <span key={i} className={`step-dot ${i < step ? 'done' : ''} ${i === step ? 'active' : ''}`} />
           ))}
         </div>
+        <button className="btn-shuffle-inline" onClick={shuffle} title="別のワーク">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
+        </button>
       </div>
 
       <div className="ps-header">
         <span className="ps-icon">{doorway.icon}</span>
-        <span className="ps-name">{doorway.name}</span>
-        <span className="ps-label">{practice.name}</span>
+        <span className="ps-name">{practice.name}</span>
         <span className="ps-source">{practice.source}</span>
       </div>
 
@@ -113,12 +116,12 @@ function PracticeScreen({ doorway, onComplete, onBack }) {
 
       <div className="ps-bottom">
         {!allDone && (
-          <>
+          <div className="step-timer-wrap">
             <div className="step-progress">
               <div className="step-progress-fill" style={{ width: `${pct}%` }} />
             </div>
             <span className="step-timer-num">{secLeft}</span>
-          </>
+          </div>
         )}
 
         {allDone && (
@@ -150,7 +153,7 @@ function WisdomScreen({ wisdomSeen, onRead, onBack }) {
       const w = WISDOM[newIdx];
       if (!wisdomSeen.includes(w.id)) onRead(w.id, 3);
       setFading(false);
-    }, 200);
+    }, 250);
   };
 
   const handleFirst = () => {
@@ -161,7 +164,9 @@ function WisdomScreen({ wisdomSeen, onRead, onBack }) {
   return (
     <div className="wisdom-screen">
       <div className="wisdom-top-bar">
-        <button className="back-btn" onClick={onBack}>←</button>
+        <button className="back-btn" onClick={onBack}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
         <span className="wisdom-count">{wisdomSeen.length}/{WISDOM.length}</span>
       </div>
 
@@ -177,7 +182,7 @@ function WisdomScreen({ wisdomSeen, onRead, onBack }) {
       </div>
 
       <button className="btn-next" onClick={handleFirst}>
-        次のカード
+        次のカードを引く
       </button>
     </div>
   );
@@ -264,14 +269,14 @@ export default function App() {
               <div className="h-sub">{getTitle(state.level)}</div>
             </div>
             <div className="h-right">
-              {state.streak > 0 && <span className="streak">🔥{state.streak}</span>}
+              {state.streak > 0 && <span className="streak">🔥 {state.streak}</span>}
               <span className="lvl">Lv.{state.level}</span>
             </div>
           </header>
 
           <div className="xp-wrap">
             <div className="xp-track"><div className="xp-fill" style={{ width: `${xpPct}%` }} /></div>
-            <span className="xp-num">{state.xp}/{state.xpNext}</span>
+            <span className="xp-num">{state.xp}/{state.xpNext} XP</span>
           </div>
 
           <main className="main">
@@ -287,6 +292,7 @@ export default function App() {
                 >
                   <span className="dw-icon">{dw.icon}</span>
                   <span className="dw-name">{dw.name}</span>
+                  <span className="dw-desc">{dw.desc}</span>
                   {todayDone.includes(dw.id) && <span className="dw-check">✓</span>}
                 </button>
               ))}
@@ -299,10 +305,10 @@ export default function App() {
             </button>
 
             <div className="stats glass">
-              <div className="st"><span className="sv">{state.totalActions}</span><span className="sl">Actions</span></div>
-              <div className="st"><span className="sv">{state.bestStreak}</span><span className="sl">Best</span></div>
-              <div className="st"><span className="sv">{todayDone.length}</span><span className="sl">Today</span></div>
-              <div className="st"><span className="sv">Lv.{state.level}</span><span className="sl">Level</span></div>
+              <div className="st"><span className="sv">{state.totalActions}</span><span className="sl">実践</span></div>
+              <div className="st"><span className="sv">{state.bestStreak}</span><span className="sl">最長</span></div>
+              <div className="st"><span className="sv">{todayDone.length}</span><span className="sl">今日</span></div>
+              <div className="st"><span className="sv">Lv.{state.level}</span><span className="sl">レベル</span></div>
             </div>
           </main>
         </>
