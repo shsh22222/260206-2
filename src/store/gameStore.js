@@ -1,9 +1,9 @@
-const KEY = 'ts_state';
+const KEY = 'aos_state';
 
 const TITLES = [
-  '目覚めし者', '観察者', '振り子の識者', 'スライドの実践者',
-  '流れの旅人', 'エネルギーの守護者', '意図の使い手',
-  '現実の設計者', 'トランサーフィンの達人', '次元の旅人',
+  '目覚めし者', '観察者', '意識の探求者', '静寂の聴者',
+  '流れの旅人', '気づきの守護者', '意図の使い手',
+  '現実の設計者', '意識の達人', '次元の旅人',
   '無限の創造者', '超越者',
 ];
 
@@ -12,19 +12,24 @@ export function getTitle(level) {
 }
 
 export function load() {
+  const today = new Date().toDateString();
   try {
     const s = localStorage.getItem(KEY);
-    if (s) return JSON.parse(s);
+    if (s) {
+      const p = JSON.parse(s);
+      if (p.todayDate !== today) {
+        p.todayDoorways = [];
+        p.todayDate = today;
+      }
+      return p;
+    }
   } catch {}
   return {
     level: 1, xp: 0, xpNext: 80,
     streak: 0, bestStreak: 0, lastDate: null,
     totalActions: 0,
-    wave: 50,
-    waveHistory: [],
-    cardsSeen: [],
-    shiftsCompleted: 0,
-    resetsCompleted: 0,
+    todayDoorways: [],
+    todayDate: today,
   };
 }
 
@@ -39,7 +44,6 @@ export function addXP(state, amount) {
     s.level += 1;
     s.xpNext = Math.floor(s.xpNext * 1.4);
   }
-  // streak
   const today = new Date().toDateString();
   if (s.lastDate !== today) {
     const last = s.lastDate ? new Date(s.lastDate) : null;

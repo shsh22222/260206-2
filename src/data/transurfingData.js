@@ -1,101 +1,367 @@
-// Consciousness OS - Multi-tradition awareness data
+// Awareness OS - Doorways to Consciousness
 
-export const AWARENESS_CARDS = [
-  // Eckhart Tolle - Presence & Ego
-  { id: 1, teacher: 'Tolle', title: '今ここ', body: '過去も未来も思考の中にしか存在しない。\n唯一のリアルは、今この瞬間だけだ。', color: '#06b6d4', symbol: '◎' },
-  { id: 2, teacher: 'Tolle', title: 'エゴの正体', body: '「自分」だと思っているもののほとんどは、\n思考が作り上げたストーリーに過ぎない。', color: '#0ea5e9', symbol: '◇' },
-  { id: 3, teacher: 'Tolle', title: 'ペインボディ', body: '過去の痛みは体に蓄積される。\nそれは「あなた」ではない。観察すれば溶けていく。', color: '#0891b2', symbol: '○' },
-  { id: 4, teacher: 'Tolle', title: '思考の隙間', body: '思考と思考の間にある静寂ーー\nそこがあなたの本質への入口だ。', color: '#22d3ee', symbol: '⊙' },
-  { id: 5, teacher: 'Tolle', title: '受容', body: '「今」に抵抗すればするほど苦しみは増す。\n受け入れた瞬間、変容が始まる。', color: '#67e8f9', symbol: '∞' },
-
-  // Sadhguru - Inner Engineering
-  { id: 6, teacher: 'Sadhguru', title: 'あなたは体ではない', body: '体は借り物だ。心も道具に過ぎない。\nでは「あなた」とは何だ？', color: '#f59e0b', symbol: '✦' },
-  { id: 7, teacher: 'Sadhguru', title: '反応から応答へ', body: '無意識の反応は束縛。\n意識的な応答は自由。その差がすべてだ。', color: '#d97706', symbol: '⬡' },
-  { id: 8, teacher: 'Sadhguru', title: '思考は記憶の再生', body: '思考とは過去の記憶の組み合わせに過ぎない。\nそれを「自分」と同一視する必要はない。', color: '#fbbf24', symbol: '◈' },
-  { id: 9, teacher: 'Sadhguru', title: '限界は心が作る', body: 'あなたの限界は状況ではなく、\nあなたの心が作り出しているものだ。', color: '#f59e0b', symbol: '☆' },
-  { id: 10, teacher: 'Sadhguru', title: '生命のインテリジェンス', body: '食べたバナナを人間の体に変える知性ーー\nそれがあなたの中で今も働いている。', color: '#eab308', symbol: '⊹' },
-
-  // Deepak Chopra - Consciousness & Intention
-  { id: 11, teacher: 'Chopra', title: '意識がすべてを創る', body: '物質が意識を生むのではない。\n意識が物質を生んでいる。', color: '#a855f7', symbol: '◉' },
-  { id: 12, teacher: 'Chopra', title: '意図の力', body: '意図を放ち、結果を手放す。\n宇宙はあなたの意図に応答する。', color: '#8b5cf6', symbol: '⟡' },
-  { id: 13, teacher: 'Chopra', title: 'シンクロニシティ', body: '偶然はない。すべてのシンクロは、\n意識が自身を認識するための道しるべだ。', color: '#7c3aed', symbol: '✧' },
-  { id: 14, teacher: 'Chopra', title: '観察者効果', body: '観察するという行為そのものが、\n現実を変化させる。あなたは傍観者ではない。', color: '#9333ea', symbol: '◎' },
-  { id: 15, teacher: 'Chopra', title: '無限の可能性', body: '純粋な意識の中には、\nあらゆる可能性が同時に存在している。', color: '#c084fc', symbol: '∞' },
-
-  // Zeland - Transurfing
-  { id: 16, teacher: 'Zeland', title: '選択肢の空間', body: 'すべての可能性は既に存在している。\nあなたは創造者ではなく、選択者だ。', color: '#6366f1', symbol: '⬡' },
-  { id: 17, teacher: 'Zeland', title: '振り子からの解放', body: '反応しないことが最大の力。\n振り子はあなたの無関心に耐えられない。', color: '#818cf8', symbol: '⚖' },
-  { id: 18, teacher: 'Zeland', title: '重要性ゼロ', body: '執着を手放した瞬間、\nすべてが自然と流れ始める。', color: '#6366f1', symbol: '○' },
-  { id: 19, teacher: 'Zeland', title: '外的意図', body: '「手に入れよう」ではなく\n「自然とそうなる」と許す。', color: '#4f46e5', symbol: '◇' },
-  { id: 20, teacher: 'Zeland', title: '鏡の法則', body: '現実はあなたの内面の反映。\n鏡に微笑めば、世界も微笑む。', color: '#818cf8', symbol: '◈' },
-
-  // Universal / Cross-tradition
-  { id: 21, teacher: 'Universal', title: '観察者としての自己', body: '思考を観ている「それ」は誰か。\nその問いが、すべての始まりだ。', color: '#ec4899', symbol: '⊙' },
-  { id: 22, teacher: 'Universal', title: '手放しの力', body: '握りしめるほど逃げていく。\n手を開けば、必要なものが残る。', color: '#f472b6', symbol: '✦' },
-  { id: 23, teacher: 'Universal', title: '分離という幻想', body: '「私」と「世界」の境界は思考が作った幻。\n本来、すべてはひとつだ。', color: '#be185d', symbol: '☆' },
-  { id: 24, teacher: 'Universal', title: '沈黙の知性', body: '言葉の向こう、思考の向こうに、\nすべてを知っている静寂がある。', color: '#db2777', symbol: '◎' },
+export const DOORWAYS = [
+  {
+    id: 'breath',
+    name: '呼吸',
+    icon: '🌬',
+    desc: '最もシンプルな「今」への入口',
+    color: '#06b6d4',
+    practices: [
+      {
+        name: '意識的な3呼吸',
+        guide: '鼻からゆっくり4秒吸い込む\n2秒止める\n口から6秒かけて吐き出す\n\nこの呼吸だけに完全に意識を向ける',
+        duration: 20,
+      },
+      {
+        name: '呼吸を数える',
+        guide: '自然な呼吸をしながら\n吐くたびに1から10まで数える\n\n数を忘れたら、それに気づいて1に戻る\nその「気づき」こそが意識だ',
+        duration: 30,
+      },
+      {
+        name: '呼吸の感覚',
+        guide: '鼻先に意識を集中する\n空気が入ってくる冷たさ\n出ていく温かさ\n\nコントロールせず、ただ感じる',
+        duration: 20,
+      },
+    ],
+    words: [
+      { text: '一つの意識的な呼吸——それだけで、あなたは無意識の思考の流れから抜け出せる。', teacher: 'Tolle' },
+      { text: '呼吸は体と意識をつなぐ架け橋。意識的に呼吸する時、あなたは完全に「生きている」。', teacher: 'Sadhguru' },
+      { text: '呼吸に意識を向けるたびに、思考の連鎖が中断される。その隙間に自由がある。', teacher: 'Tolle' },
+    ],
+  },
+  {
+    id: 'body',
+    name: '身体',
+    icon: '🧘',
+    desc: '体の感覚を通じて今に戻る',
+    color: '#f59e0b',
+    practices: [
+      {
+        name: '足の裏を感じる',
+        guide: '今、足の裏に意識を向ける\n床との接触面\n温度、圧力、振動\n\n体は常に「今」にいる',
+        duration: 15,
+      },
+      {
+        name: '両手のエネルギー',
+        guide: '両手を膝の上に置く\n手のひらの内側に意識を向ける\nピリピリする感覚、温かさ\n\nそれがあなたの生命エネルギーだ',
+        duration: 15,
+      },
+      {
+        name: 'クイックボディスキャン',
+        guide: '足の先から頭のてっぺんまで\n意識をゆっくり上げていく\n\n緊張している場所に気づいたら\nそこに呼吸を送る',
+        duration: 25,
+      },
+    ],
+    words: [
+      { text: '体の内側を感じてみなさい。そこにあるエネルギー——それが意識そのものだ。', teacher: 'Tolle' },
+      { text: 'あなたの体は宇宙で最も複雑な現象だ。それを意識的に体験しているか？', teacher: 'Sadhguru' },
+      { text: '思考は過去と未来をさまようが、体は常に今ここにある。体に戻ることは、今に戻ることだ。', teacher: 'Universal' },
+    ],
+  },
+  {
+    id: 'thoughts',
+    name: '思考を観る',
+    icon: '☁️',
+    desc: '思考を雲のように眺める',
+    color: '#8b5cf6',
+    practices: [
+      {
+        name: '思考にラベルを貼る',
+        guide: '浮かんでくる思考に気づいたら\n「計画」「心配」「記憶」「判断」と\n静かにラベルを貼る\n\nラベルを貼れたなら\nあなたは思考ではない',
+        duration: 20,
+      },
+      {
+        name: '次の思考を待つ',
+        guide: '猫がネズミの穴を見張るように\n「次はどんな思考が来るか？」\nと待ち構える\n\n待っている間——思考は来ない',
+        duration: 15,
+      },
+      {
+        name: '思考の川を眺める',
+        guide: '川岸に座って\n川の流れを眺めるイメージ\n\n流れは思考。あなたは岸にいる\n流れに飛び込まず、ただ見ている',
+        duration: 20,
+      },
+    ],
+    words: [
+      { text: '思考を観察し始めた瞬間、より高い意識が作動する。あなたは思考ではなく、それを見ている存在だ。', teacher: 'Tolle' },
+      { text: '思考は知性ではない。データの再生に過ぎない。あなたはそのデータではない。', teacher: 'Sadhguru' },
+      { text: '思考は道具だ。しかしほとんどの人は、道具に使われている。それに気づくことが最初の一歩。', teacher: 'Sadhguru' },
+    ],
+  },
+  {
+    id: 'silence',
+    name: '内なる沈黙',
+    icon: '🔇',
+    desc: '思考の奥にある静寂に触れる',
+    color: '#6366f1',
+    practices: [
+      {
+        name: '音の奥を聴く',
+        guide: '今聞こえるすべての音に耳を傾ける\nそしてその音の「背景」に意識を向ける\n\n音を包み込んでいる沈黙\nそれがあなたの本質だ',
+        duration: 25,
+      },
+      {
+        name: '思考の隙間に入る',
+        guide: '思考と思考の間にある\nほんの一瞬の空白に気づく\n\nその空白を少しだけ広げる\n無理せず、ただ気づくだけで',
+        duration: 20,
+      },
+      {
+        name: '存在を感じる',
+        guide: '目を閉じて\n「自分が在る」という感覚だけに意識を向ける\n\n名前も肩書きも思考もなく\nただ「在る」ことを感じる',
+        duration: 30,
+      },
+    ],
+    words: [
+      { text: '沈黙はあなたの自然な状態だ。騒がしさは後から付け加えられたものに過ぎない。', teacher: 'Tolle' },
+      { text: '沈黙の中に、すべての問いへの答えがある。心を静めれば、宇宙が語り始める。', teacher: 'Chopra' },
+      { text: '言葉の向こう、思考の向こうに、すべてを知っている静寂がある。', teacher: 'Universal' },
+    ],
+  },
+  {
+    id: 'senses',
+    name: '五感',
+    icon: '✨',
+    desc: '感覚を通して世界を新鮮に体験する',
+    color: '#ec4899',
+    practices: [
+      {
+        name: '音に集中する',
+        guide: '今、聞こえるすべての音に\n意識を完全に向ける\n\n遠くの音、近くの音\nラベルを貼らず、ただ音として聴く',
+        duration: 15,
+      },
+      {
+        name: '本当に「見る」',
+        guide: '目の前にあるものを一つ選ぶ\n初めて見るかのように、じっと見る\n\n色、形、影、質感\n名前を忘れて、ただ見る',
+        duration: 15,
+      },
+      {
+        name: '触覚に意識を向ける',
+        guide: '肌に触れている空気\n服の生地の感触\n手が触れている面の温度\n\n普段無視している感覚に気づく',
+        duration: 15,
+      },
+    ],
+    words: [
+      { text: '完全に今にいる時、世界は驚くほど生き生きとする。当たり前のものが奇跡になる。', teacher: 'Tolle' },
+      { text: '十分な注意を払えば、宇宙のあらゆる原子が覚醒への入口になる。', teacher: 'Sadhguru' },
+      { text: '五感は「今」への門だ。感覚に意識を向けるたびに、思考の支配から自由になる。', teacher: 'Universal' },
+    ],
+  },
+  {
+    id: 'letgo',
+    name: '手放し',
+    icon: '💧',
+    desc: '握りしめているものに気づき、放す',
+    color: '#22d3ee',
+    practices: [
+      {
+        name: '体の緊張を手放す',
+        guide: '肩、顎、眉間\n無意識に力が入っている場所を見つける\n\n見つけたら、息を吐きながら\nその力をゆるめる',
+        duration: 15,
+      },
+      {
+        name: '思考を手放す',
+        guide: '今、頭の中にある考え事\nそれを「持っている」感覚に気づく\n\n息を吐きながら\nその思考を手のひらから放すイメージ',
+        duration: 20,
+      },
+      {
+        name: '重要性を下げる',
+        guide: '今、重要だと感じていること\nそれにどれだけエネルギーを注いでいるか\n\n「大丈夫、なんとかなる」\n重要性を意識的に下げる',
+        duration: 20,
+      },
+    ],
+    words: [
+      { text: '執着を手放した瞬間、すべてが自然と流れ始める。手を開けば、必要なものが残る。', teacher: 'Zeland' },
+      { text: '「今」に抵抗すればするほど苦しみは増す。受け入れた瞬間、変容が始まる。', teacher: 'Tolle' },
+      { text: '過剰な重要性はバランスの力を生み出す。軽やかでいることが最善を招く。', teacher: 'Zeland' },
+    ],
+  },
+  {
+    id: 'accept',
+    name: '受容',
+    icon: '🌊',
+    desc: '今この瞬間をそのまま受け入れる',
+    color: '#4ade80',
+    practices: [
+      {
+        name: '「はい」と言う',
+        guide: '今この瞬間に\n静かに「はい」と言う\n\n状況を変えようとせず\nまず、あるがままを認める',
+        duration: 15,
+      },
+      {
+        name: '抵抗を見つける',
+        guide: '今、何かに抵抗していないか？\n「こうあるべき」と思っていないか？\n\n抵抗に気づいたら\nそれを責めず、ただ認める',
+        duration: 20,
+      },
+      {
+        name: 'あるがままを許す',
+        guide: '今の自分の状態\n今の感情、今の状況\n\nすべてを、ちょうどこのままで\n存在することを許す',
+        duration: 20,
+      },
+    ],
+    words: [
+      { text: '今この瞬間がどんなものであれ、自分が選んだかのように受け入れなさい。それが変容の始まりだ。', teacher: 'Tolle' },
+      { text: '受容は妥協ではない。意識の選択だ。受け入れた瞬間、あなたは状況より大きくなる。', teacher: 'Sadhguru' },
+      { text: '抵抗をやめた瞬間、エネルギーは変容に使われ始める。受け入れは諦めではない、覚醒だ。', teacher: 'Tolle' },
+    ],
+  },
+  {
+    id: 'emotion',
+    name: '感情を感じる',
+    icon: '🔥',
+    desc: '感情を判断せず、ただ感じ切る',
+    color: '#ef4444',
+    practices: [
+      {
+        name: '感情を体で見つける',
+        guide: '今、何か感情があるなら\nそれが体のどこにあるか探す\n\n胸？腹？喉？\nその場所に呼吸を送る',
+        duration: 20,
+      },
+      {
+        name: '感情に名前をつける',
+        guide: '今感じているものに\n静かに名前をつける\n\n「不安」「苛立ち」「悲しみ」「焦り」\n名前をつけた瞬間、距離が生まれる',
+        duration: 15,
+      },
+      {
+        name: '感情の波を見送る',
+        guide: '感情は波のようなもの\n必ず来て、必ず去る\n\nこの波に乗らず、飲まれず\n岸から波を見ているだけでいい',
+        duration: 25,
+      },
+    ],
+    words: [
+      { text: 'ペインボディが活性化した時、それに気づけるかどうかが覚醒と無意識の境界線だ。', teacher: 'Tolle' },
+      { text: '感情をただ見つめる意志があれば、あなたはそこから自由になれる。', teacher: 'Sadhguru' },
+      { text: '感情はあなたではない。あなたを通り過ぎる天気のようなもの。空はいつも晴れている。', teacher: 'Universal' },
+    ],
+  },
+  {
+    id: 'observer',
+    name: '観察者',
+    icon: '👁',
+    desc: '見ている「それ」に気づく',
+    color: '#a855f7',
+    practices: [
+      {
+        name: '「見ているのは誰か」',
+        guide: '思考を見ている自分に気づく\nその自分を見ている自分に気づく\n\n最後に残る「見ている意識」\nそれが本当のあなただ',
+        duration: 20,
+      },
+      {
+        name: '自分を外から眺める',
+        guide: '今の自分を\n少し上から眺めるイメージ\n\nここにいる一人の人間\nその思考、感情、体の状態\nすべてを優しく見守る',
+        duration: 20,
+      },
+      {
+        name: '気づきに気づく',
+        guide: '今、あなたは意識がある\nその「意識がある」という事実に\n意識を向ける\n\n意識が自分自身を認識する瞬間',
+        duration: 25,
+      },
+    ],
+    words: [
+      { text: 'あなたは思考ではない。思考の背後にある気づきそのものだ。', teacher: 'Tolle' },
+      { text: '観察するという行為そのものが、現実を変化させる。あなたは傍観者ではない。', teacher: 'Chopra' },
+      { text: '「私は誰か」——この問いへの答えは言葉にならない。その言葉にならないものが、あなたの本質だ。', teacher: 'Universal' },
+    ],
+  },
+  {
+    id: 'intention',
+    name: '意図',
+    icon: '🎯',
+    desc: '意識的な意図を放つ',
+    color: '#f472b6',
+    practices: [
+      {
+        name: '今日の意図を立てる',
+        guide: '今日一日をどう在りたいか\n一言で意図を立てる\n\n「穏やかに」「意識的に」「軽やかに」\nその一言を心に刻む',
+        duration: 15,
+      },
+      {
+        name: 'スライド — 理想の場面',
+        guide: '理想の自分が生きている\nある場面を鮮明にイメージする\n\n五感で感じる：見えるもの、音、香り\nその時の感情を今、体で味わう',
+        duration: 30,
+      },
+      {
+        name: '意図を放つ',
+        guide: '叶えたいことを心に浮かべる\nそれを「意図」として宇宙に放つ\n\n放ったら、結果を手放す\n「自然とそうなる」と信頼する',
+        duration: 20,
+      },
+    ],
+    words: [
+      { text: '意図を放ち、結果を手放す。宇宙はあなたの意図に応答する。', teacher: 'Chopra' },
+      { text: '「手に入れよう」ではなく「自然とそうなる」と許す。それが外的意図だ。', teacher: 'Zeland' },
+      { text: '選択肢の空間にはすべてが既にある。あなたは創造者ではなく、選択者だ。', teacher: 'Zeland' },
+    ],
+  },
+  {
+    id: 'gratitude',
+    name: '感謝',
+    icon: '🙏',
+    desc: '感謝を通じて意識を拡げる',
+    color: '#fbbf24',
+    practices: [
+      {
+        name: '3つの感謝',
+        guide: '今あるものを3つ見つけて\n心の中で「ありがとう」と言う\n\n当たり前に思えるものほど\n実は奇跡だ',
+        duration: 15,
+      },
+      {
+        name: '体に感謝する',
+        guide: '心臓が動いていること\n目が見えること、耳が聞こえること\n呼吸ができること\n\n何も考えなくてもこれが起きている奇跡',
+        duration: 15,
+      },
+      {
+        name: 'この瞬間の奇跡',
+        guide: '138億年の宇宙の歴史が\nこの瞬間のあなたに至っている\n\nここに存在していること自体が\n途方もない奇跡だ',
+        duration: 20,
+      },
+    ],
+    words: [
+      { text: '自分の人生を見てみなさい。努力なしにどれだけ多くのものがもたらされてきたか。', teacher: 'Sadhguru' },
+      { text: '感謝は宇宙の力への扉を開く。感謝する時、あなたは豊かさの周波数にいる。', teacher: 'Chopra' },
+      { text: '感謝は「今あるもの」を「十分なもの」に変える。そこに平和がある。', teacher: 'Universal' },
+    ],
+  },
+  {
+    id: 'space',
+    name: 'エネルギー',
+    icon: '🌀',
+    desc: '体の内側と周りのエネルギーを感じる',
+    color: '#818cf8',
+    practices: [
+      {
+        name: '体の周りの空間',
+        guide: '体の周り数センチの空間に\n意識を向ける\n\nそこにある微細なエネルギー\n温かさや振動を感じてみる',
+        duration: 20,
+      },
+      {
+        name: 'エネルギーボディ',
+        guide: '目を閉じて\n体の内側全体を一度に感じる\n\nピリピリする感覚、温かさ、脈動\nそれがあなたのエネルギーボディだ',
+        duration: 25,
+      },
+      {
+        name: '空間を感じる',
+        guide: '意識を体の外に広げる\n部屋全体を同時に感じる\n\n壁、天井、空間のすべてを\n包み込む意識として在る',
+        duration: 20,
+      },
+    ],
+    words: [
+      { text: '体の内側の生命力を感じてみなさい。それは意識そのものだ。', teacher: 'Tolle' },
+      { text: 'あなたのエネルギーは最も貴重な資源だ。振り子にそれを奪わせるな。', teacher: 'Zeland' },
+      { text: '注意を払えば、あなたの体は終わる場所ではなく、始まる場所だとわかる。', teacher: 'Sadhguru' },
+    ],
+  },
 ];
 
-export const EGO_PATTERNS = [
-  { pattern: '比較', thought: '「あの人より自分は...」', trap: 'エゴは比較で自己像を作る。比較がなければエゴは消える。', teacher: 'Tolle' },
-  { pattern: '正当化', thought: '「自分は正しい、相手が間違い」', trap: '正しさへの執着はエゴの最も好む餌。正しくなくても大丈夫。', teacher: 'Tolle' },
-  { pattern: '被害者意識', thought: '「なぜ自分ばかり...」', trap: 'ストーリーを手放せ。今この瞬間に問題は存在するか？', teacher: 'Tolle' },
-  { pattern: '将来への不安', thought: '「もし〜になったらどうしよう」', trap: '未来は思考の中にしか存在しない。今ここに戻れ。', teacher: 'Tolle' },
-  { pattern: '承認欲求', thought: '「認められたい、評価されたい」', trap: '他者の評価は他者の心の反映。あなたの本質とは無関係だ。', teacher: 'Sadhguru' },
-  { pattern: '過去への執着', thought: '「あの時ああしていれば...」', trap: '過去を変えることはできない。今の意識だけが変えられる。', teacher: 'Chopra' },
-  { pattern: 'コントロール欲', thought: '「思い通りにならなければ」', trap: '宇宙をコントロールしようとするのはエゴ。流れに委ねよ。', teacher: 'Zeland' },
-  { pattern: '自己否定', thought: '「自分には価値がない」', trap: 'それはエゴの別の顔。過小評価もまた自己像への執着だ。', teacher: 'Sadhguru' },
-  { pattern: '過剰な重要性', thought: '「これは絶対に失敗できない」', trap: '重要性を上げるほど、バランスの力が働く。軽やかでいろ。', teacher: 'Zeland' },
-  { pattern: '分離感', thought: '「自分は孤独だ、誰もわかってくれない」', trap: '分離は最大の幻想。あなたは全体の一部として常に繋がっている。', teacher: 'Chopra' },
-  { pattern: 'レッテル貼り', thought: '「自分は〇〇な人間だ」', trap: 'あらゆるアイデンティティは限定。あなたはラベルより大きい。', teacher: 'Sadhguru' },
-  { pattern: '反応の自動操縦', thought: '（無意識に怒り・不安・焦り）', trap: '反応に気づいた瞬間、もうそれに支配されていない。', teacher: 'Universal' },
-];
-
-export const MIND_SHIFTS = [
-  { before: 'なぜ自分にこんなことが起きるのか', after: 'この状況は何を教えようとしているのか', tradition: 'Chopra' },
-  { before: '将来が不安で仕方ない', after: '未来は思考の中だけ。今この呼吸に戻る', tradition: 'Tolle' },
-  { before: '絶対に失敗できない', after: '重要性を下げる。軽やかさが最善を招く', tradition: 'Zeland' },
-  { before: '自分はダメな人間だ', after: 'それはエゴのストーリー。私は思考ではない', tradition: 'Tolle' },
-  { before: 'あの人が許せない', after: '怒りは自分の中のペインボディ。観察して手放す', tradition: 'Tolle' },
-  { before: 'もっと頑張らないと手に入らない', after: '意図を放ち、結果を宇宙に委ねる', tradition: 'Chopra' },
-  { before: '周りの人にイライラする', after: '外の世界は内面の鏡。自分の反応を観る', tradition: 'Zeland' },
-  { before: '自分には何もできない', after: '限界は心が作っている。意識がすべてを創る', tradition: 'Sadhguru' },
-  { before: '比較して落ち込む', after: '比較はエゴのゲーム。自分の道を歩むだけだ', tradition: 'Sadhguru' },
-  { before: '変化が怖い', after: '変化は意識の拡大。抵抗が苦しみを生む', tradition: 'Universal' },
-  { before: '認められたい', after: '承認は外にはない。自分の内側にすでにある', tradition: 'Sadhguru' },
-  { before: '完璧でなければ', after: '完璧主義は過剰なポテンシャル。「十分だ」と知る', tradition: 'Zeland' },
-];
-
-export const PRESENCE_ANCHORS = [
-  { name: '呼吸に戻る', desc: '3回の深い呼吸。吸う・止める・吐くを感じる', duration: 15, icon: '🌬' },
-  { name: 'ボディスキャン', desc: '足の裏→頭頂まで、体の感覚を観察する', duration: 25, icon: '🧘' },
-  { name: '思考を観る', desc: '思考を雲のように眺める。同一視しない', duration: 20, icon: '☁️' },
-  { name: '五感に集中', desc: '今聞こえる音・見えるもの・感じる温度に意識を向ける', duration: 15, icon: '✨' },
-  { name: '内なる沈黙', desc: '思考の隙間に意識を向ける。静寂を聴く', duration: 30, icon: '🔇' },
-  { name: 'スライド30秒', desc: '理想の一場面を感情と共に鮮明にイメージ', duration: 30, icon: '🎬' },
-];
-
-export const AWARENESS_CHECK = [
-  { q: '今、思考に巻き込まれている？', low: '完全に同一化', high: '観察できている' },
-  { q: 'エゴの反応に気づけてる？', low: '自動操縦中', high: '明確に気づいてる' },
-  { q: '今この瞬間にいる？', low: '過去か未来にいる', high: '完全に今ここ' },
-  { q: '体の感覚を感じられる？', low: '全く感じない', high: '鮮明に感じる' },
-  { q: '内側に静けさがある？', low: '思考でうるさい', high: '深い静寂がある' },
-];
-
-export const DEEP_INSIGHTS = [
-  { text: 'あなたが怒りを感じている時ーーその怒りを「観ている」存在に気づけるか。観ている側が本当のあなただ。', teacher: 'Tolle' },
-  { text: 'エゴは「時間」の中でしか存在できない。今この瞬間には、エゴのための居場所がない。', teacher: 'Tolle' },
-  { text: '99%の人間の苦しみは、状況そのものではなく、状況についての「思考」から生まれている。', teacher: 'Sadhguru' },
-  { text: '宇宙の全歴史があなたをこの瞬間に運んできた。この瞬間を否定する必要があるだろうか。', teacher: 'Chopra' },
-  { text: '振り子はあなたが反応するたびに強くなる。しかし、あなたが気づいた瞬間、その力は消える。', teacher: 'Zeland' },
-  { text: '思考は道具だ。しかしほとんどの人は、道具に使われている。', teacher: 'Sadhguru' },
-  { text: '「私は誰か」ーーこの問いへの答えは言葉にはならない。言葉にならないその何かが、あなたの本質だ。', teacher: 'Universal' },
-  { text: '抵抗をやめた瞬間、エネルギーは変容に使われ始める。受け入れは諦めではない。覚醒だ。', teacher: 'Tolle' },
-  { text: '選択肢の空間にはすべてが既にある。あなたは思考の周波数でそれを選んでいる。', teacher: 'Zeland' },
-  { text: 'あなたの本質は生まれもしなければ、死にもしない。体が服であるように、人生もまた衣に過ぎない。', teacher: 'Sadhguru' },
-  { text: '意識は局所的なものではない。あなたの意識は、宇宙の意識と同じものだ。', teacher: 'Chopra' },
-  { text: 'ペインボディが活性化した時、それに気づけるかどうかが覚醒と無意識の境界線だ。', teacher: 'Tolle' },
+export const DAILY_WISDOM = [
+  { text: '今日一日、思考に巻き込まれている自分に何回気づけるか。その「気づき」が意識だ。', teacher: 'Tolle' },
+  { text: '反応する前に一呼吸。その一呼吸が、無意識と意識の分かれ道になる。', teacher: 'Universal' },
+  { text: '振り子はあなたが反応するたびに強くなる。気づいた瞬間、その力は消える。', teacher: 'Zeland' },
+  { text: '99%の苦しみは状況そのものではなく、状況についての思考から生まれている。', teacher: 'Sadhguru' },
+  { text: '宇宙の全歴史があなたをこの瞬間に運んできた。この瞬間を否定する必要があるか。', teacher: 'Chopra' },
+  { text: 'あなたが今、意識的でいること——それだけで世界の意識レベルが上がっている。', teacher: 'Universal' },
+  { text: 'すべての出来事に「これは何を教えようとしているのか」と問うてみる。', teacher: 'Chopra' },
+  { text: '体は常に「今」にいる。思考だけが過去と未来をさまよう。体に戻ればいい。', teacher: 'Tolle' },
+  { text: '重要性を下げた瞬間、バランスの力が消え、物事は自然と好転し始める。', teacher: 'Zeland' },
+  { text: '毎朝目覚めるとき、あなたは新しい意識で新しい現実を選んでいる。', teacher: 'Chopra' },
 ];
 
 export const TEACHER_COLORS = {
