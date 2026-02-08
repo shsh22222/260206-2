@@ -1,97 +1,105 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { REALITY_CARDS, MINDSET_SHIFTS, AFFIRMATIONS, WAVE_QUESTIONS, QUICK_RESETS } from './data/transurfingData';
+import {
+  AWARENESS_CARDS, EGO_PATTERNS, MIND_SHIFTS, PRESENCE_ANCHORS,
+  AWARENESS_CHECK, DEEP_INSIGHTS, TEACHER_COLORS, TEACHER_LABELS,
+} from './data/transurfingData';
 import { load, save, addXP, getTitle } from './store/gameStore';
 import './App.css';
 
-/* ─── Particle background ─── */
+function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+/* ── Particles ── */
 function Particles() {
   return (
-    <div className="particles">
-      {Array.from({ length: 20 }, (_, i) => (
-        <div key={i} className="particle" style={{
-          left: `${Math.random() * 100}%`,
-          animationDelay: `${Math.random() * 8}s`,
-          animationDuration: `${6 + Math.random() * 8}s`,
-          opacity: 0.15 + Math.random() * 0.2,
-          width: `${2 + Math.random() * 3}px`,
-          height: `${2 + Math.random() * 3}px`,
-        }} />
-      ))}
-    </div>
+    <div className="particles">{Array.from({ length: 18 }, (_, i) => (
+      <div key={i} className="particle" style={{
+        left: `${Math.random() * 100}%`,
+        animationDelay: `${Math.random() * 8}s`,
+        animationDuration: `${6 + Math.random() * 8}s`,
+        opacity: 0.12 + Math.random() * 0.18,
+        width: `${2 + Math.random() * 3}px`, height: `${2 + Math.random() * 3}px`,
+      }} />
+    ))}</div>
   );
 }
 
-/* ─── XP Toast ─── */
-function XPToast({ show, amount }) {
-  if (!show) return null;
-  return <div className="xp-toast">+{amount} XP</div>;
+function XPToast({ amount }) {
+  if (amount === null) return null;
+  return <div className="xp-toast" key={Date.now()}>+{amount} XP</div>;
 }
 
-/* ─── Level Up Overlay ─── */
 function LevelUp({ level, onDone }) {
   if (!level) return null;
   return (
     <div className="overlay" onClick={onDone}>
-      <div className="level-up-card">
+      <div className="level-up-card" onClick={e => e.stopPropagation()}>
         <div className="lu-glow" />
         <div className="lu-level">Lv.{level}</div>
         <div className="lu-title">{getTitle(level)}</div>
-        <div className="lu-msg">新しい称号を獲得</div>
+        <div className="lu-msg">意識のレベルが上がった</div>
         <button className="btn-glow" onClick={onDone}>OK</button>
       </div>
     </div>
   );
 }
 
-/* ─── Reality Card Draw ─── */
+function TeacherTag({ teacher }) {
+  return (
+    <span className="teacher-tag" style={{ color: TEACHER_COLORS[teacher], borderColor: TEACHER_COLORS[teacher] + '44' }}>
+      {TEACHER_LABELS[teacher]}
+    </span>
+  );
+}
+
+/* ── Daily Insight (top) ── */
+function DailyInsight({ onXP }) {
+  const [insight] = useState(() => rand(DEEP_INSIGHTS));
+  const [accepted, setAccepted] = useState(false);
+  const accept = () => { if (!accepted) { onXP(10); setAccepted(true); } };
+
+  return (
+    <div className="insight-card glass" onClick={accept}>
+      <div className="insight-glow" style={{ background: `radial-gradient(circle,${TEACHER_COLORS[insight.teacher]}18,transparent 70%)` }} />
+      <p className="insight-text">{insight.text}</p>
+      <div className="insight-footer">
+        <TeacherTag teacher={insight.teacher} />
+        {!accepted && <span className="insight-tap">tap +10XP</span>}
+        {accepted && <span className="insight-done">✓</span>}
+      </div>
+    </div>
+  );
+}
+
+/* ── Awareness Card Draw ── */
 function CardDraw({ onXP }) {
   const [card, setCard] = useState(null);
   const [flipped, setFlipped] = useState(false);
-  const [drawing, setDrawing] = useState(false);
+  const [shaking, setShaking] = useState(false);
 
   const draw = () => {
-    setDrawing(true);
-    setFlipped(false);
-    setTimeout(() => {
-      const c = REALITY_CARDS[Math.floor(Math.random() * REALITY_CARDS.length)];
-      setCard(c);
-      setDrawing(false);
-      setTimeout(() => setFlipped(true), 50);
-    }, 600);
+    setShaking(true);
+    setTimeout(() => { setCard(rand(AWARENESS_CARDS)); setShaking(false); setTimeout(() => setFlipped(true), 80); }, 500);
   };
+  const done = () => { onXP(15); setCard(null); setFlipped(false); };
 
-  const done = () => {
-    onXP(15);
-    setCard(null);
-    setFlipped(false);
-  };
-
-  if (!card) {
-    return (
-      <div className="section-card glass" onClick={draw}>
-        <div className={`card-deck ${drawing ? 'deck-shake' : ''}`}>
-          <div className="deck-card dc3" />
-          <div className="deck-card dc2" />
-          <div className="deck-card dc1">
-            <span className="deck-icon">✦</span>
-          </div>
-        </div>
-        <div className="section-label">Reality Card</div>
-        <div className="section-sub">タップしてカードを引く</div>
+  if (!card) return (
+    <div className="section-card glass" onClick={draw}>
+      <div className={`card-deck ${shaking ? 'deck-shake' : ''}`}>
+        <div className="dk dc3" /><div className="dk dc2" /><div className="dk dc1"><span>✦</span></div>
       </div>
-    );
-  }
+      <div><div className="section-label">Awareness Card</div><div className="section-sub">タップで意識のカードを引く</div></div>
+    </div>
+  );
 
   return (
-    <div className="drawn-card-wrap">
-      <div className={`drawn-card ${flipped ? 'flipped' : ''}`} style={{ '--card-color': card.color }}>
-        <div className="dc-front">
-          <div className="dc-icon">{card.icon}</div>
-        </div>
-        <div className="dc-back">
-          <div className="dc-symbol">{card.icon}</div>
-          <h3 className="dc-title">{card.title}</h3>
-          <p className="dc-body">{card.body}</p>
+    <div className="flip-wrap">
+      <div className={`flip-card ${flipped ? 'flipped' : ''}`} style={{ '--cc': card.color }}>
+        <div className="flip-front"><span className="flip-sym">{card.symbol}</span></div>
+        <div className="flip-back">
+          <span className="flip-sym-s">{card.symbol}</span>
+          <h3>{card.title}</h3>
+          <p className="flip-body">{card.body}</p>
+          <TeacherTag teacher={card.teacher} />
           <button className="btn-glass" onClick={done}>心に刻む +15XP</button>
         </div>
       </div>
@@ -99,104 +107,88 @@ function CardDraw({ onXP }) {
   );
 }
 
-/* ─── Mindset Shift Game ─── */
-function MindsetShift({ onXP }) {
+/* ── Ego Detector ── */
+function EgoDetector({ onXP }) {
+  const [active, setActive] = useState(false);
+  const [pattern, setPattern] = useState(null);
+  const [revealed, setRevealed] = useState(false);
+
+  const start = () => { setPattern(rand(EGO_PATTERNS)); setActive(true); setRevealed(false); };
+  const done = () => { onXP(20); setActive(false); };
+
+  if (!active) return (
+    <div className="section-card glass" onClick={start}>
+      <div className="ego-icon">👁</div>
+      <div><div className="section-label">Ego Detector</div><div className="section-sub">今のエゴパターンに気づく</div></div>
+    </div>
+  );
+
+  return (
+    <div className="ego-game glass">
+      <div className="ego-pattern-name">{pattern.pattern}</div>
+      <div className="ego-thought">{pattern.thought}</div>
+      {!revealed ? (
+        <button className="btn-reveal" onClick={() => setRevealed(true)}>
+          <span className="reveal-eye">👁</span>気づきを得る
+        </button>
+      ) : (
+        <div className="ego-reveal">
+          <p className="ego-trap">{pattern.trap}</p>
+          <TeacherTag teacher={pattern.teacher} />
+          <button className="btn-glass" onClick={done}>気づいた +20XP</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ── Mind Shift ── */
+function MindShift({ onXP }) {
   const [active, setActive] = useState(false);
   const [shift, setShift] = useState(null);
   const [revealed, setRevealed] = useState(false);
-  const [dragging, setDragging] = useState(false);
   const [dragX, setDragX] = useState(0);
+  const dragging = useRef(false);
   const startX = useRef(0);
 
-  const start = () => {
-    const s = MINDSET_SHIFTS[Math.floor(Math.random() * MINDSET_SHIFTS.length)];
-    setShift(s);
-    setActive(true);
-    setRevealed(false);
-    setDragX(0);
-  };
+  const start = () => { setShift(rand(MIND_SHIFTS)); setActive(true); setRevealed(false); setDragX(0); };
+  const done = () => { onXP(20); setActive(false); };
 
-  const handleTouchStart = (e) => {
-    startX.current = e.touches[0].clientX;
-    setDragging(true);
-  };
-  const handleTouchMove = (e) => {
-    if (!dragging) return;
-    const diff = e.touches[0].clientX - startX.current;
-    setDragX(Math.max(0, diff));
-  };
-  const handleTouchEnd = () => {
-    setDragging(false);
-    if (dragX > 120) {
-      setRevealed(true);
-    } else {
-      setDragX(0);
-    }
-  };
-  const handleMouseDown = (e) => {
-    startX.current = e.clientX;
-    setDragging(true);
-  };
-  const handleMouseMove = (e) => {
-    if (!dragging) return;
-    const diff = e.clientX - startX.current;
-    setDragX(Math.max(0, diff));
-  };
-  const handleMouseUp = () => {
-    setDragging(false);
-    if (dragX > 120) {
-      setRevealed(true);
-    } else {
-      setDragX(0);
-    }
-  };
+  const onDown = (x) => { startX.current = x; dragging.current = true; };
+  const onMove = (x) => { if (dragging.current) setDragX(Math.max(0, x - startX.current)); };
+  const onUp = () => { dragging.current = false; if (dragX > 100) setRevealed(true); else setDragX(0); };
 
-  const done = () => {
-    onXP(20);
-    setActive(false);
-  };
-
-  if (!active) {
-    return (
-      <div className="section-card glass shift-card" onClick={start}>
-        <div className="shift-icon">⟲</div>
-        <div className="section-label">Mindset Shift</div>
-        <div className="section-sub">思考をトランサーフィンに変換</div>
-      </div>
-    );
-  }
+  if (!active) return (
+    <div className="section-card glass" onClick={start}>
+      <div className="shift-icon">⟲</div>
+      <div><div className="section-label">Mind Shift</div><div className="section-sub">無意識の思考を意識的に変換</div></div>
+    </div>
+  );
 
   return (
     <div className="shift-game">
-      <div className="shift-before">
-        <span className="shift-tag">Before</span>
+      <div className="shift-before glass">
+        <span className="shift-tag">無意識の思考</span>
         <p>{shift.before}</p>
       </div>
-
       {!revealed ? (
-        <div
-          className="shift-swipe"
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
-        >
+        <div className="swipe-area"
+          onTouchStart={e => onDown(e.touches[0].clientX)}
+          onTouchMove={e => onMove(e.touches[0].clientX)}
+          onTouchEnd={onUp}
+          onMouseDown={e => onDown(e.clientX)}
+          onMouseMove={e => onMove(e.clientX)}
+          onMouseUp={onUp} onMouseLeave={onUp}>
           <div className="swipe-track">
-            <div className="swipe-thumb" style={{ transform: `translateX(${dragX}px)` }}>
-              <span>→</span>
-            </div>
-            <span className="swipe-label" style={{ opacity: 1 - dragX / 150 }}>
-              スワイプで変換
-            </span>
+            <div className="swipe-thumb" style={{ transform: `translateX(${dragX}px)` }}>→</div>
+            <span className="swipe-hint" style={{ opacity: 1 - dragX / 120 }}>スワイプで意識を変換</span>
           </div>
         </div>
       ) : (
-        <div className="shift-after">
-          <span className="shift-tag after">After — {shift.principle}</span>
+        <div className="shift-after glass">
+          <span className="shift-tag after">意識的な応答</span>
           <p>{shift.after}</p>
+          <TeacherTag teacher={shift.tradition} />
           <button className="btn-glass" onClick={done}>変換完了 +20XP</button>
         </div>
       )}
@@ -204,196 +196,119 @@ function MindsetShift({ onXP }) {
   );
 }
 
-/* ─── Quick Reset ─── */
-function QuickReset({ onXP }) {
+/* ── Presence Anchor ── */
+function PresenceAnchors({ onXP }) {
   const [active, setActive] = useState(null);
   const [timer, setTimer] = useState(0);
   const [running, setRunning] = useState(false);
-  const intervalRef = useRef(null);
-
-  const startReset = (reset) => {
-    setActive(reset);
-    setTimer(reset.duration);
-    setRunning(true);
-  };
 
   useEffect(() => {
-    if (running && timer > 0) {
-      intervalRef.current = setTimeout(() => setTimer(t => t - 1), 1000);
-      return () => clearTimeout(intervalRef.current);
-    }
-    if (running && timer === 0) {
-      setRunning(false);
-      onXP(10);
-    }
+    if (!running || timer <= 0) { if (running && timer <= 0) { setRunning(false); onXP(12); } return; }
+    const t = setTimeout(() => setTimer(v => v - 1), 1000);
+    return () => clearTimeout(t);
   }, [running, timer, onXP]);
 
-  const close = () => {
-    setActive(null);
-    setRunning(false);
-    clearTimeout(intervalRef.current);
-  };
+  const close = () => { setActive(null); setRunning(false); };
 
   if (active) {
-    const progress = timer > 0 ? ((active.duration - timer) / active.duration) * 100 : 100;
+    const pct = active.duration > 0 ? ((active.duration - timer) / active.duration) * 100 : 100;
     return (
-      <div className="reset-active glass">
-        <div className="reset-icon-big">{active.icon}</div>
+      <div className="presence-active glass">
+        <div className="pa-icon">{active.icon}</div>
         <h3>{active.name}</h3>
-        <p className="reset-desc">{active.desc}</p>
-        <div className="reset-ring">
+        <p className="pa-desc">{active.desc}</p>
+        <div className="pa-ring">
           <svg viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r="44" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="4" />
-            <circle cx="50" cy="50" r="44" fill="none" stroke="url(#grad)" strokeWidth="4"
-              strokeDasharray={`${progress * 2.764} 276.4`} strokeLinecap="round"
-              transform="rotate(-90 50 50)" />
-            <defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#6366f1" /><stop offset="100%" stopColor="#06b6d4" />
-            </linearGradient></defs>
+            <circle cx="50" cy="50" r="44" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="3" />
+            <circle cx="50" cy="50" r="44" fill="none" stroke="url(#pg)" strokeWidth="3"
+              strokeDasharray={`${pct * 2.764} 276.4`} strokeLinecap="round" transform="rotate(-90 50 50)" />
+            <defs><linearGradient id="pg"><stop offset="0%" stopColor="#6366f1" /><stop offset="100%" stopColor="#06b6d4" /></linearGradient></defs>
           </svg>
-          <span className="reset-time">{timer > 0 ? timer : '✓'}</span>
+          <span className="pa-time">{timer > 0 ? timer : '✓'}</span>
         </div>
-        {timer === 0 ? (
-          <button className="btn-glow" onClick={close}>完了 +10XP</button>
-        ) : (
-          <button className="btn-ghost" onClick={close}>キャンセル</button>
-        )}
+        {timer <= 0 ? <button className="btn-glow" onClick={close}>完了 +12XP</button>
+          : <button className="btn-ghost" onClick={close}>キャンセル</button>}
       </div>
     );
   }
 
   return (
-    <div className="reset-grid">
-      {QUICK_RESETS.map((r, i) => (
-        <button key={i} className="reset-chip glass" onClick={() => startReset(r)}>
-          <span className="reset-chip-icon">{r.icon}</span>
-          <span className="reset-chip-name">{r.name}</span>
-          <span className="reset-chip-dur">{r.duration}s</span>
+    <div className="anchor-grid">
+      {PRESENCE_ANCHORS.map((a, i) => (
+        <button key={i} className="anchor-chip glass" onClick={() => { setActive(a); setTimer(a.duration); setRunning(true); }}>
+          <span className="ac-icon">{a.icon}</span>
+          <span className="ac-name">{a.name}</span>
+          <span className="ac-dur">{a.duration}s</span>
         </button>
       ))}
     </div>
   );
 }
 
-/* ─── Wave Check ─── */
-function WaveCheck({ onXP, state, setState }) {
+/* ── Awareness Check ── */
+function AwarenessCheck({ onXP, state, setState }) {
   const [active, setActive] = useState(false);
   const [step, setStep] = useState(0);
   const [scores, setScores] = useState([]);
-  const [currentVal, setCurrentVal] = useState(50);
+  const [val, setVal] = useState(50);
 
-  const start = () => { setActive(true); setStep(0); setScores([]); setCurrentVal(50); };
-
+  const start = () => { setActive(true); setStep(0); setScores([]); setVal(50); };
   const next = () => {
-    const newScores = [...scores, currentVal];
-    setScores(newScores);
-    setCurrentVal(50);
-    if (step < WAVE_QUESTIONS.length - 1) {
-      setStep(step + 1);
-    } else {
-      const avg = Math.round(newScores.reduce((a, b) => a + b, 0) / newScores.length);
-      const newState = { ...state, wave: avg, waveHistory: [...state.waveHistory.slice(-13), { v: avg, d: Date.now() }] };
-      setState(newState);
-      save(newState);
-      onXP(25);
-      setActive(false);
+    const ns = [...scores, val]; setScores(ns); setVal(50);
+    if (step < AWARENESS_CHECK.length - 1) { setStep(step + 1); }
+    else {
+      const avg = Math.round(ns.reduce((a, b) => a + b, 0) / ns.length);
+      const s = { ...state, wave: avg, waveHistory: [...state.waveHistory.slice(-13), { v: avg, d: Date.now() }] };
+      setState(s); save(s); onXP(25); setActive(false);
     }
   };
 
-  const waveColor = (v) => v > 70 ? '#4ade80' : v > 40 ? '#fbbf24' : '#ef4444';
-  const waveLabel = (v) => v > 80 ? '最高の流れ' : v > 60 ? '良い波動' : v > 40 ? '普通' : v > 20 ? '要注意' : '振り子の影響大';
+  const color = v => v > 70 ? '#4ade80' : v > 40 ? '#fbbf24' : '#ef4444';
+  const label = v => v > 80 ? '深い覚醒' : v > 60 ? '意識的' : v > 40 ? '普通' : v > 20 ? '自動操縦' : 'エゴの支配下';
 
-  if (!active) {
-    return (
-      <div className="section-card glass wave-card" onClick={start}>
-        <div className="wave-visual">
-          <div className="wave-bar-bg">
-            <div className="wave-bar-fill" style={{ height: `${state.wave}%`, background: waveColor(state.wave) }} />
-          </div>
-          <div className="wave-value" style={{ color: waveColor(state.wave) }}>{state.wave}</div>
-        </div>
-        <div>
-          <div className="section-label">Wave Check</div>
-          <div className="section-sub">{waveLabel(state.wave)}</div>
-        </div>
+  if (!active) return (
+    <div className="section-card glass wave-card" onClick={start}>
+      <div className="wave-vis">
+        <div className="wave-bg"><div className="wave-fill" style={{ height: `${state.wave}%`, background: color(state.wave) }} /></div>
+        <span className="wave-val" style={{ color: color(state.wave) }}>{state.wave}</span>
       </div>
-    );
-  }
+      <div><div className="section-label">Awareness Level</div><div className="section-sub">{label(state.wave)}</div></div>
+    </div>
+  );
 
-  const q = WAVE_QUESTIONS[step];
+  const q = AWARENESS_CHECK[step];
   return (
-    <div className="wave-active glass">
-      <div className="wave-step">{step + 1} / {WAVE_QUESTIONS.length}</div>
-      <h3 className="wave-q">{q.q}</h3>
-      <div className="wave-slider-wrap">
-        <span className="wave-end">{q.low}</span>
-        <input type="range" min="0" max="100" value={currentVal}
-          onChange={e => setCurrentVal(Number(e.target.value))}
-          className="wave-slider" />
-        <span className="wave-end">{q.high}</span>
+    <div className="check-active glass">
+      <div className="check-step">{step + 1}/{AWARENESS_CHECK.length}</div>
+      <h3 className="check-q">{q.q}</h3>
+      <div className="check-slider-wrap">
+        <span className="check-end">{q.low}</span>
+        <input type="range" min="0" max="100" value={val} onChange={e => setVal(+e.target.value)} className="check-slider" />
+        <span className="check-end">{q.high}</span>
       </div>
-      <div className="wave-current" style={{ color: waveColor(currentVal) }}>{currentVal}</div>
-      <button className="btn-glow" onClick={next}>
-        {step < WAVE_QUESTIONS.length - 1 ? '次へ' : '完了 +25XP'}
-      </button>
+      <div className="check-val" style={{ color: color(val) }}>{val}</div>
+      <button className="btn-glow" onClick={next}>{step < AWARENESS_CHECK.length - 1 ? '次へ' : '完了 +25XP'}</button>
     </div>
   );
 }
 
-/* ─── Affirmation ─── */
-function Affirmation({ onXP }) {
-  const [text, setText] = useState('');
-  const [visible, setVisible] = useState(false);
-
-  const show = () => {
-    const a = AFFIRMATIONS[Math.floor(Math.random() * AFFIRMATIONS.length)];
-    setText(a);
-    setVisible(true);
-  };
-
-  const accept = () => {
-    onXP(10);
-    setVisible(false);
-  };
-
-  if (visible) {
-    return (
-      <div className="affirmation-active glass">
-        <div className="aff-glow-ring" />
-        <p className="aff-text">{text}</p>
-        <button className="btn-glass" onClick={accept}>受け入れる +10XP</button>
-      </div>
-    );
-  }
-
-  return (
-    <div className="section-card glass aff-card" onClick={show}>
-      <div className="aff-icon">◉</div>
-      <div className="section-label">Affirmation</div>
-      <div className="section-sub">今日のアファメーションを受け取る</div>
-    </div>
-  );
-}
-
-/* ─── Main App ─── */
+/* ── Main ── */
 export default function App() {
   const [state, setState] = useState(load);
   const [toast, setToast] = useState(null);
   const [levelUp, setLevelUp] = useState(null);
-  const toastTimer = useRef(null);
+  const tt = useRef(null);
 
   const handleXP = useCallback((amount) => {
     setState(prev => {
-      const oldLevel = prev.level;
+      const old = prev.level;
       const next = addXP(prev, amount);
-      if (next.level > oldLevel) {
-        setLevelUp(next.level);
-      }
+      if (next.level > old) setLevelUp(next.level);
       return next;
     });
     setToast(amount);
-    clearTimeout(toastTimer.current);
-    toastTimer.current = setTimeout(() => setToast(null), 1200);
+    clearTimeout(tt.current);
+    tt.current = setTimeout(() => setToast(null), 1200);
   }, []);
 
   const xpPct = (state.xp / state.xpNext) * 100;
@@ -402,47 +317,41 @@ export default function App() {
     <div className="app">
       <Particles />
 
-      {/* Header */}
       <header className="header glass">
         <div className="h-left">
-          <div className="h-title">Transurfing</div>
-          <div className="h-subtitle">{getTitle(state.level)}</div>
+          <div className="h-title">Awareness OS</div>
+          <div className="h-sub">{getTitle(state.level)}</div>
         </div>
         <div className="h-right">
-          {state.streak > 0 && <span className="streak-pill">🔥{state.streak}</span>}
-          <div className="level-pill">Lv.{state.level}</div>
+          {state.streak > 0 && <span className="streak">🔥{state.streak}</span>}
+          <span className="lvl">Lv.{state.level}</span>
         </div>
       </header>
 
-      {/* XP Bar */}
-      <div className="xp-bar-wrap">
-        <div className="xp-bar">
-          <div className="xp-fill" style={{ width: `${xpPct}%` }} />
-        </div>
-        <span className="xp-label">{state.xp}/{state.xpNext}</span>
+      <div className="xp-wrap">
+        <div className="xp-track"><div className="xp-fill" style={{ width: `${xpPct}%` }} /></div>
+        <span className="xp-num">{state.xp}/{state.xpNext}</span>
       </div>
 
-      {/* Content */}
       <main className="main">
+        <DailyInsight onXP={handleXP} />
         <CardDraw onXP={handleXP} />
-        <MindsetShift onXP={handleXP} />
-        <WaveCheck onXP={handleXP} state={state} setState={setState} />
+        <EgoDetector onXP={handleXP} />
+        <MindShift onXP={handleXP} />
+        <AwarenessCheck onXP={handleXP} state={state} setState={setState} />
 
-        <div className="section-header">Quick Reset</div>
-        <QuickReset onXP={handleXP} />
+        <div className="sh">Presence Anchor</div>
+        <PresenceAnchors onXP={handleXP} />
 
-        <Affirmation onXP={handleXP} />
-
-        {/* Mini Stats */}
-        <div className="stats-row glass">
-          <div className="stat"><span className="stat-v">{state.totalActions}</span><span className="stat-l">Actions</span></div>
-          <div className="stat"><span className="stat-v">{state.bestStreak}</span><span className="stat-l">Best Streak</span></div>
-          <div className="stat"><span className="stat-v">{state.wave}</span><span className="stat-l">Wave</span></div>
-          <div className="stat"><span className="stat-v">Lv.{state.level}</span><span className="stat-l">Level</span></div>
+        <div className="stats glass">
+          <div className="st"><span className="sv">{state.totalActions}</span><span className="sl">Actions</span></div>
+          <div className="st"><span className="sv">{state.bestStreak}</span><span className="sl">Best Streak</span></div>
+          <div className="st"><span className="sv">{state.wave}</span><span className="sl">Awareness</span></div>
+          <div className="st"><span className="sv">Lv.{state.level}</span><span className="sl">Level</span></div>
         </div>
       </main>
 
-      <XPToast show={toast !== null} amount={toast} />
+      <XPToast amount={toast} />
       <LevelUp level={levelUp} onDone={() => setLevelUp(null)} />
     </div>
   );
