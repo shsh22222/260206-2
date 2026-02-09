@@ -675,10 +675,10 @@ export const GAMES = [
     color: '#6366f1',
   },
   {
-    id: 'mind-pair',
-    name: 'マインドペア',
-    icon: '🃏',
-    desc: '意識の概念を記憶で繋げ',
+    id: 'perception-shift',
+    name: '知覚シフト',
+    icon: '✨',
+    desc: 'エゴの知覚を光に変えろ',
     color: '#22d3ee',
   },
 ];

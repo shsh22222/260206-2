@@ -432,12 +432,12 @@ const ZEN_MSGS = [
   { min: 0, text: '正確さより、数えること自体に意識を向けて。' },
 ];
 
-const PAIR_MSGS = [
-  { min: 95, text: '驚異的な記憶力と注意力。意識の統合が起きている。' },
-  { min: 80, text: '優れたワーキングメモリ。マインドフルな集中力。' },
-  { min: 60, text: '記憶と集中のバランスが良い。着実に育っている。' },
-  { min: 40, text: '注意を向ける力が育っている。' },
-  { min: 0, text: '繰り返すほど、記憶の回路は強化される。' },
+const SHIFT_MSGS = [
+  { min: 95, text: '聖霊の目で世界を見ている。赦しの達人。' },
+  { min: 80, text: 'エゴを手放す力が育っている。光が増している。' },
+  { min: 60, text: '知覚の転換が起き始めている。赦しの筋力がつく。' },
+  { min: 40, text: '赦しの練習は続けるほど自然になる。' },
+  { min: 0, text: 'エゴの声に気づいた——それが最初の奇跡。' },
 ];
 
 /* ── Game 1: Thought Stop (Enhanced - 120s S rank) ── */
@@ -1510,163 +1510,243 @@ function ZenCountGame({ onComplete, onBack }) {
   );
 }
 
-/* ── Game 8: Mind Pair — ACT memory card matching (concept pairs) ── */
-const MIND_PAIRS = [
-  { concept: '観察', match: '思考を眺める' },
-  { concept: '受容', match: '抵抗しない' },
-  { concept: '脱フュージョン', match: '思考と距離を取る' },
-  { concept: 'マインドフルネス', match: '今この瞬間' },
-  { concept: '価値', match: '人生の方向性' },
-  { concept: 'コミットメント', match: '行動を選ぶ' },
-  { concept: 'セルフコンパッション', match: '自分への優しさ' },
-  { concept: 'レジリエンス', match: '回復力' },
-  { concept: 'フロー状態', match: '完全な没頭' },
-  { concept: 'メタ認知', match: '思考を思考する' },
+/* ── Game 8: Perception Shift — ACIM forgiveness (rapid-tap to transform) ── */
+const SHIFT_SCENARIOS = [
+  {
+    ego: '満員電車で押された。なんて非常識な人だ',
+    spirit: 'この人も疲れている。私は平安を選ぶ',
+    lesson: '全ての攻撃は助けを求める叫び',
+  },
+  {
+    ego: '友人に陰口を言われた。信じていたのに裏切られた',
+    spirit: '友人も不安を抱えている。私は赦しを選ぶ',
+    lesson: '赦しとは自分自身を自由にすること',
+  },
+  {
+    ego: '上司に理不尽に怒られた。あいつは最低だ',
+    spirit: '上司もプレッシャーの中にいる。平安を手放さない',
+    lesson: '私が見ているのは自分の内面の投影',
+  },
+  {
+    ego: '恋人に冷たくされた。自分は愛される価値がない',
+    spirit: '私の価値は変わらない。愛は内側から溢れる',
+    lesson: '愛は外に求めるものではなく思い出すもの',
+  },
+  {
+    ego: 'SNSで他人の成功を見た。自分だけ取り残されている',
+    spirit: '他者の光は私の光でもある。比較は幻想だ',
+    lesson: '分離は知覚の誤り——私たちは一つ',
+  },
+  {
+    ego: '大事なプレゼンで失敗した。もう終わりだ',
+    spirit: 'この経験が次の成長を生む。私は完全なまま',
+    lesson: '失敗という概念はエゴが作った幻想',
+  },
+  {
+    ego: '家族に理解されない。なぜ分かってくれないのか',
+    spirit: '家族も愛し方を探している。違いを赦そう',
+    lesson: '理解を求める前に理解しようとする',
+  },
+  {
+    ego: '後輩に抜かれた。自分には才能がない',
+    spirit: '全ての魂に固有の道がある。私のペースでいい',
+    lesson: '比較はエゴの策略——真の自己に序列はない',
+  },
+  {
+    ego: '約束を破られた。人は信用できない',
+    spirit: 'この人も完璧ではない。私も同じ。赦しを選ぶ',
+    lesson: '兄弟を裁くとき、自分を牢獄に閉じ込める',
+  },
+  {
+    ego: '努力が報われない。世界は不公平だ',
+    spirit: '結果への執着を手放す。行動そのものが贈り物',
+    lesson: '聖霊に結果を委ねよ',
+  },
+  {
+    ego: '見知らぬ人に嫌な顔をされた。何が悪いんだ',
+    spirit: 'あの人の一日が大変だったのかもしれない',
+    lesson: '誰もが目に見えない戦いを戦っている',
+  },
+  {
+    ego: '自分の過去の行いを思い出す。最悪な人間だった',
+    spirit: 'あの時の私も精一杯だった。今の私が赦す',
+    lesson: '過去は存在しない——今この瞬間だけが真実',
+  },
+  {
+    ego: '老いていく自分の体。怖い。何もかも衰えていく',
+    spirit: '体は乗り物。本当の私は永遠に変わらない',
+    lesson: '私は体ではない。私は自由だ',
+  },
+  {
+    ego: '世界は争いばかり。希望なんてない',
+    spirit: '光はどんな闇の中にも消えない。私がその光になる',
+    lesson: '世界を変えるには自分の知覚を変えよ',
+  },
+  {
+    ego: '誰も自分のことを必要としていない。孤独だ',
+    spirit: '分離感は幻想。私は全てと繋がっている',
+    lesson: '孤独はエゴの最大の嘘',
+  },
 ];
 
-function MindPairGame({ onComplete, onBack }) {
+function PerceptionShiftGame({ onComplete, onBack }) {
   const [phase, setPhase] = useState('ready');
-  const [cards, setCards] = useState([]);
-  const [flipped, setFlipped] = useState([]);
-  const [matched, setMatched] = useState([]);
+  const [scenarios, setScenarios] = useState([]);
+  const [current, setCurrent] = useState(0);
   const [score, setScore] = useState(0);
   const [combo, setCombo] = useState(0);
   const [maxCombo, setMaxCombo] = useState(0);
-  const [moves, setMoves] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(60);
-  const [feedback, setFeedback] = useState(null);
+  const [shifted, setShifted] = useState(0);
+  const [meter, setMeter] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [lives, setLives] = useState(4);
+  const [showLesson, setShowLesson] = useState(null);
+  const [lightLevel, setLightLevel] = useState(0);
   const comboRef = useRef(0);
   const timerRef = useRef(null);
-  const lockRef = useRef(false);
-  const PAIR_COUNT = 8;
+  const meterRef = useRef(0);
+  const livesRef = useRef(4);
+  const TOTAL = 12;
+  const TAPS_NEEDED = 15;
 
   const startGame = () => {
-    const selected = [...MIND_PAIRS].sort(() => Math.random() - 0.5).slice(0, PAIR_COUNT);
-    const cardSet = [];
-    selected.forEach((pair, idx) => {
-      cardSet.push({ id: idx * 2, pairId: idx, text: pair.concept, type: 'concept' });
-      cardSet.push({ id: idx * 2 + 1, pairId: idx, text: pair.match, type: 'match' });
-    });
-    cardSet.sort(() => Math.random() - 0.5);
-    setCards(cardSet);
-    setFlipped([]);
-    setMatched([]);
+    const shuffled = [...SHIFT_SCENARIOS].sort(() => Math.random() - 0.5).slice(0, TOTAL);
+    setScenarios(shuffled);
+    setCurrent(0);
     setScore(0);
     comboRef.current = 0;
     setCombo(0);
     setMaxCombo(0);
-    setMoves(0);
-    setTimeLeft(60);
-    lockRef.current = false;
+    setShifted(0);
+    setMeter(0);
+    meterRef.current = 0;
+    setLives(4);
+    livesRef.current = 4;
+    setLightLevel(0);
+    setShowLesson(null);
     setPhase('playing');
+  };
 
-    timerRef.current = setInterval(() => {
+  // Timer per round
+  useEffect(() => {
+    if (phase !== 'playing' || showLesson) return;
+    const limit = Math.max(4, 7 - Math.floor(current / 3));
+    setTimeLeft(limit);
+    setMeter(0);
+    meterRef.current = 0;
+    const id = setInterval(() => {
       setTimeLeft(t => {
         if (t <= 1) {
-          clearInterval(timerRef.current);
-          setPhase('done');
+          clearInterval(id);
+          // Failed to shift
+          comboRef.current = 0;
+          setCombo(0);
+          livesRef.current -= 1;
+          setLives(livesRef.current);
+          if (livesRef.current <= 0) {
+            setPhase('done');
+            return 0;
+          }
+          setCurrent(c => {
+            if (c + 1 >= scenarios.length) setPhase('done');
+            return c + 1;
+          });
           return 0;
         }
         return t - 1;
       });
     }, 1000);
-  };
+    timerRef.current = id;
+    return () => clearInterval(id);
+  }, [phase, current, showLesson, scenarios.length]);
 
-  const flipCard = (card) => {
-    if (phase !== 'playing' || lockRef.current) return;
-    if (flipped.includes(card.id) || matched.includes(card.pairId)) return;
+  const handleTap = () => {
+    if (phase !== 'playing' || showLesson || !scenarios[current]) return;
+    const newMeter = meterRef.current + (100 / TAPS_NEEDED);
+    meterRef.current = newMeter;
+    setMeter(Math.min(100, newMeter));
 
-    const newFlipped = [...flipped, card.id];
-    setFlipped(newFlipped);
+    if (newMeter >= 100) {
+      // Shift complete!
+      clearInterval(timerRef.current);
+      const timeBonus = timeLeft * 6;
+      const mult = 1 + comboRef.current * 0.2;
+      const pts = Math.round((40 + timeBonus) * mult);
+      setScore(s => s + pts);
+      setShifted(s => s + 1);
+      comboRef.current += 1;
+      setCombo(comboRef.current);
+      setMaxCombo(prev => Math.max(prev, comboRef.current));
+      setLightLevel(l => Math.min(100, l + (100 / TOTAL)));
 
-    if (newFlipped.length === 2) {
-      lockRef.current = true;
-      setMoves(m => m + 1);
-      const [firstId, secondId] = newFlipped;
-      const first = cards.find(c => c.id === firstId);
-      const second = cards.find(c => c.id === secondId);
-
-      if (first.pairId === second.pairId) {
-        // Match!
-        const timeBonus = Math.round(timeLeft * 0.5);
-        const mult = 1 + comboRef.current * 0.2;
-        const pts = Math.round((30 + timeBonus) * mult);
-        setScore(s => s + pts);
-        comboRef.current += 1;
-        setCombo(comboRef.current);
-        setMaxCombo(prev => Math.max(prev, comboRef.current));
-        setMatched(prev => {
-          const next = [...prev, first.pairId];
-          if (next.length >= PAIR_COUNT) {
-            clearInterval(timerRef.current);
-            setTimeout(() => setPhase('done'), 600);
+      // Show lesson briefly
+      setShowLesson({ lesson: scenarios[current].lesson, pts });
+      setTimeout(() => {
+        setShowLesson(null);
+        setCurrent(c => {
+          if (c + 1 >= scenarios.length) {
+            setTimeout(() => setPhase('done'), 200);
           }
-          return next;
+          return c + 1;
         });
-        setFeedback({ type: 'correct', pts, text: `${first.type === 'concept' ? first.text : second.text} = ${first.type === 'match' ? first.text : second.text}` });
-        setTimeout(() => { setFlipped([]); lockRef.current = false; setFeedback(null); }, 700);
-      } else {
-        // No match
-        comboRef.current = 0;
-        setCombo(0);
-        setFeedback({ type: 'wrong' });
-        setTimeout(() => { setFlipped([]); lockRef.current = false; setFeedback(null); }, 800);
-      }
+      }, 1500);
     }
   };
 
   useEffect(() => () => clearInterval(timerRef.current), []);
 
-  const pct = PAIR_COUNT > 0 ? Math.min(100, (matched.length / PAIR_COUNT) * 100) : 0;
-  const efficiency = moves > 0 ? Math.min(100, Math.round((matched.length / moves) * 100)) : 0;
+  const pct = current > 0 ? Math.min(100, (shifted / Math.max(1, current)) * 100) : 0;
+  const sc = scenarios[current];
+  const meterPct = Math.min(100, meter);
+  // Interpolate displayed text from ego to spirit based on meter
+  const displayText = sc ? (meterPct < 50 ? sc.ego : sc.spirit) : '';
 
   return (
     <div className="game-screen" style={{ '--gc': '#22d3ee' }}>
-      <div className="gs-top"><BackBtn onClick={onBack} /><span className="gs-badge">🃏 マインドペア</span></div>
+      <div className="gs-top"><BackBtn onClick={onBack} /><span className="gs-badge">✨ 知覚シフト</span></div>
       <div className="gs-body">
         {phase === 'ready' && (
           <div className="gs-center">
-            <span className="gs-big-icon">🃏</span>
-            <h2 className="gs-title">マインドペア</h2>
-            <p className="gs-desc">ACTの概念とその意味をマッチング!<br/>カードをめくってペアを見つけよう<br/>60秒以内に{PAIR_COUNT}ペア完成せよ!</p>
+            <span className="gs-big-icon">✨</span>
+            <h2 className="gs-title">知覚シフト</h2>
+            <p className="gs-desc">エゴの声が聞こえる——<br/>連打して光のメーターを満タンにしろ!<br/>知覚が変わる瞬間を体感せよ<br/>{TOTAL}ラウンド。ライフ4。</p>
             <button className="gs-start-btn" onClick={startGame}>スタート</button>
           </div>
         )}
-        {phase === 'playing' && (
-          <div className="gs-center mindpair-area">
-            <div className="mindpair-hud">
-              <span>{matched.length}/{PAIR_COUNT}ペア</span>
-              <span>{timeLeft}s</span>
-              <span>{moves}手</span>
-            </div>
+        {phase === 'playing' && sc && (
+          <div className="gs-center pshift-area" onClick={handleTap}>
+            <span className="gs-round-num">{current + 1}/{TOTAL}</span>
+            <span className="gs-lives" style={{ position: 'absolute', top: 46, left: 16 }}>{'❤️'.repeat(Math.max(0, lives))}</span>
+            <span className="pshift-timer">{timeLeft}s</span>
             <ComboDisplay combo={combo} multiplier={1 + combo * 0.2} />
-            <div className="mindpair-grid">
-              {cards.map(card => {
-                const isFlipped = flipped.includes(card.id) || matched.includes(card.pairId);
-                const isMatched = matched.includes(card.pairId);
-                return (
-                  <button key={card.id}
-                    className={`mindpair-card ${isFlipped ? 'flipped' : ''} ${isMatched ? 'matched' : ''} ${card.type}`}
-                    onClick={() => flipCard(card)}
-                    disabled={isMatched}
-                  >
-                    <span className="mindpair-card-inner">
-                      {isFlipped ? card.text : '?'}
-                    </span>
-                  </button>
-                );
-              })}
+
+            <div className="pshift-light-bg" style={{ opacity: lightLevel / 100 * 0.3 }} />
+
+            <div className={`pshift-card ${meterPct >= 50 ? 'shifting' : 'ego'} ${meterPct >= 100 ? 'shifted' : ''}`}>
+              <p className="pshift-label">{meterPct < 50 ? 'エゴの声' : '聖霊の声'}</p>
+              <p className="pshift-text">{displayText}</p>
             </div>
-            {feedback && <span className={`tap-feedback ${feedback.type === 'correct' ? 'perfect' : 'miss'}`}>
-              {feedback.type === 'correct' ? `${feedback.text} +${feedback.pts}` : 'ミスマッチ!'}
-            </span>}
+
+            <div className="pshift-meter-wrap">
+              <div className="pshift-meter-track">
+                <div className="pshift-meter-fill" style={{ width: `${meterPct}%` }} />
+              </div>
+              <span className="pshift-meter-label">{meterPct < 100 ? '連打して知覚を変えろ!' : '赦し完了!'}</span>
+            </div>
+
+            {showLesson && (
+              <div className="pshift-lesson">
+                <p className="pshift-lesson-text">{showLesson.lesson}</p>
+                <span className="pshift-lesson-pts">+{showLesson.pts}pt</span>
+              </div>
+            )}
+
             <span className="breath-score">スコア: {score}</span>
           </div>
         )}
         {phase === 'done' && (
-          <GameResult score={score} pct={matched.length >= PAIR_COUNT ? Math.max(efficiency, 60) : pct}
-            gameId="mind-pair" label="pt"
-            messages={PAIR_MSGS}
+          <GameResult score={score} pct={pct} gameId="perception-shift" label="pt"
+            messages={SHIFT_MSGS}
             onRetry={() => setPhase('ready')} onComplete={onComplete} />
         )}
       </div>
@@ -1683,7 +1763,7 @@ const GAME_COMPONENTS = {
   'efficacy': EfficacyGame,
   'emotion-label': EmotionLabelGame,
   'zen-count': ZenCountGame,
-  'mind-pair': MindPairGame,
+  'perception-shift': PerceptionShiftGame,
 };
 
 /* ── Main ── */

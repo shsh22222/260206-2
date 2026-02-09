@@ -1030,38 +1030,70 @@ button{border:none;background:none;cursor:pointer;font:inherit;color:inherit;-we
 .elabel-opt.correct{background:rgba(74,222,128,.18);border-color:#4ade80;color:#4ade80}
 .elabel-opt.wrong{background:rgba(239,68,68,.18);border-color:#ef4444;color:#ef4444}
 
-/* ── Mind Pair Game ── */
-.mindpair-area{gap:8px;padding:12px 8px}
-.mindpair-hud{
-  display:flex;justify-content:space-between;width:100%;max-width:340px;
-  font-size:.85rem;color:#94a3b8;padding:0 4px;
+/* ── Perception Shift Game (ACIM) ── */
+.pshift-area{gap:8px;padding:12px 8px;position:relative;overflow:hidden}
+.pshift-timer{
+  position:absolute;top:16px;right:16px;font-size:1.1rem;
+  font-weight:700;color:#67e8f9;
 }
-.mindpair-grid{
-  display:grid;grid-template-columns:repeat(4, 1fr);gap:6px;
-  width:100%;max-width:340px;margin:8px 0;
+.pshift-light-bg{
+  position:absolute;inset:0;
+  background:radial-gradient(circle at center, rgba(251,191,36,.4), rgba(255,255,255,.1), transparent 70%);
+  pointer-events:none;transition:opacity .8s ease;
 }
-.mindpair-card{
-  aspect-ratio:1/1.15;border-radius:10px;
-  background:rgba(34,211,238,.06);border:1px solid rgba(34,211,238,.15);
-  color:#94a3b8;font-size:.72rem;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  transition:all .25s ease;padding:4px;text-align:center;
+.pshift-card{
+  width:100%;max-width:320px;border-radius:16px;padding:20px 16px;
+  margin:8px 0;transition:all .6s ease;min-height:100px;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
 }
-.mindpair-card:active{transform:scale(.96)}
-.mindpair-card.flipped{
-  background:rgba(34,211,238,.12);border-color:rgba(34,211,238,.35);
-  color:#67e8f9;font-weight:600;
+.pshift-card.ego{
+  background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);
 }
-.mindpair-card.flipped.concept{
-  background:rgba(139,92,246,.12);border-color:rgba(139,92,246,.35);
-  color:#c4b5fd;
+.pshift-card.shifting{
+  background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);
 }
-.mindpair-card.matched{
-  background:rgba(74,222,128,.12);border-color:rgba(74,222,128,.3);
-  color:#86efac;opacity:.7;
+.pshift-card.shifted{
+  background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.35);
+  box-shadow:0 0 30px rgba(251,191,36,.15);
 }
-.mindpair-card-inner{
-  font-size:inherit;line-height:1.2;word-break:break-all;
+.pshift-label{
+  font-size:.78rem;font-weight:600;letter-spacing:1px;
+  text-transform:uppercase;margin-bottom:4px;
+}
+.pshift-card.ego .pshift-label{color:#f87171}
+.pshift-card.shifting .pshift-label{color:#fbbf24}
+.pshift-card.shifted .pshift-label{color:#4ade80}
+.pshift-text{
+  font-size:1.05rem;line-height:1.6;text-align:center;
+  color:#e2e8f0;transition:all .4s ease;
+}
+.pshift-meter-wrap{
+  width:100%;max-width:300px;display:flex;flex-direction:column;
+  align-items:center;gap:6px;margin:8px 0;
+}
+.pshift-meter-track{
+  width:100%;height:10px;border-radius:5px;
+  background:rgba(255,255,255,.08);overflow:hidden;
+}
+.pshift-meter-fill{
+  height:100%;border-radius:5px;transition:width .08s linear;
+  background:linear-gradient(90deg, #ef4444, #f59e0b, #4ade80);
+}
+.pshift-meter-label{
+  font-size:.82rem;color:#94a3b8;font-weight:500;
+}
+.pshift-lesson{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:12px;
+  background:rgba(0,0,0,.7);backdrop-filter:blur(8px);
+  animation:fadeIn .3s ease;z-index:10;border-radius:16px;
+}
+.pshift-lesson-text{
+  font-size:1.15rem;color:#fde68a;font-weight:600;
+  text-align:center;padding:0 20px;line-height:1.6;
+}
+.pshift-lesson-pts{
+  font-size:1.3rem;color:#4ade80;font-weight:800;
 }
 
 /* ── Animations ── */
