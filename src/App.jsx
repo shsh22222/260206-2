@@ -154,7 +154,7 @@ function PracticeScreen({ doorway, onComplete, onBack }) {
   }, [secLeft, allDone, stepReady]);
 
   const advanceStep = () => {
-    if (!stepReady) return;
+    if (allDone) return;
     if (isLast) {
       setAllDone(true);
     } else {
@@ -200,9 +200,9 @@ function PracticeScreen({ doorway, onComplete, onBack }) {
         <span className="ps-source">{practice.source}</span>
       </div>
 
-      <div className={`step-area ${stepReady ? 'step-ready' : ''}`} key={stepKey} onClick={advanceStep}>
+      <div className={`step-area step-ready`} key={stepKey} onClick={advanceStep}>
         <p className="step-text">{steps[step].text}</p>
-        {stepReady && !allDone && (
+        {!allDone && (
           <div className="tap-prompt">
             <span className="tap-icon">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M12 18v-6M8 14l4 4 4-4"/><circle cx="12" cy="6" r="2"/></svg>
