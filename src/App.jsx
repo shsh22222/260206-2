@@ -129,7 +129,7 @@ function GameResult({ score, pct, gameId, label, messages, onRetry, onComplete }
   );
 }
 
-/* ── Practice Screen (Timer + Tap to Advance) ── */
+/* ── Practice Screen (Auto-advance + Tap to skip) ── */
 function PracticeScreen({ doorway, onComplete, onBack }) {
   const initP = useRef(Math.floor(Math.random() * doorway.practices.length));
   const [pIdx, setPIdx] = useState(initP.current);
@@ -139,19 +139,25 @@ function PracticeScreen({ doorway, onComplete, onBack }) {
   const [step, setStep] = useState(0);
   const [stepKey, setStepKey] = useState(0);
   const [secLeft, setSecLeft] = useState(steps[0].sec);
-  const [stepReady, setStepReady] = useState(false);
   const [allDone, setAllDone] = useState(false);
   const isLast = step >= steps.length - 1;
 
   useEffect(() => {
-    if (allDone || stepReady) return;
+    if (allDone) return;
     if (secLeft <= 0) {
-      setStepReady(true);
+      if (isLast) {
+        setAllDone(true);
+      } else {
+        const next = step + 1;
+        setStep(next);
+        setStepKey(k => k + 1);
+        setSecLeft(steps[next].sec);
+      }
       return;
     }
     const t = setTimeout(() => setSecLeft(v => v - 1), 1000);
     return () => clearTimeout(t);
-  }, [secLeft, allDone, stepReady]);
+  }, [secLeft, allDone, step, isLast, steps]);
 
   const advanceStep = () => {
     if (allDone) return;
@@ -162,7 +168,6 @@ function PracticeScreen({ doorway, onComplete, onBack }) {
       setStep(next);
       setStepKey(k => k + 1);
       setSecLeft(steps[next].sec);
-      setStepReady(false);
     }
   };
 
@@ -173,7 +178,6 @@ function PracticeScreen({ doorway, onComplete, onBack }) {
     setStep(0);
     setStepKey(k => k + 1);
     setSecLeft(newPractice.steps[0].sec);
-    setStepReady(false);
     setAllDone(false);
   };
 
@@ -205,7 +209,7 @@ function PracticeScreen({ doorway, onComplete, onBack }) {
       </div>
 
       <div className="ps-bottom">
-        {!allDone && !stepReady && (
+        {!allDone && (
           <div className="step-timer-wrap">
             <div className="step-progress">
               <div className="step-progress-fill" style={{ width: `${pct}%` }} />
