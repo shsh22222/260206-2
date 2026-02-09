@@ -202,14 +202,6 @@ function PracticeScreen({ doorway, onComplete, onBack }) {
 
       <div className={`step-area step-ready`} key={stepKey} onClick={advanceStep}>
         <p className="step-text">{steps[step].text}</p>
-        {!allDone && (
-          <div className="tap-prompt">
-            <span className="tap-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M12 18v-6M8 14l4 4 4-4"/><circle cx="12" cy="6" r="2"/></svg>
-            </span>
-            <span className="tap-text">タップして次へ</span>
-          </div>
-        )}
       </div>
 
       <div className="ps-bottom">
